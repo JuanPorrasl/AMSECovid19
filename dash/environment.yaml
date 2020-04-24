@@ -2,6 +2,8 @@ local:
   directory:
     application: './' 
 
+  debug: True
+
 
 staging:
   directory:
@@ -11,3 +13,6 @@ staging:
 production:
   directory:
     application: '/home/debian/covid-app' 
+
+  port: 80
+

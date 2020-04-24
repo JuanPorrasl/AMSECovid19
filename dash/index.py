@@ -26,6 +26,7 @@ import time
 from app import app, auth
 from pages import page_france, page_brazil, page_worldwide, page_analysis
 
+
 # Reading environment file for configuration
 CONFIGURATION_FILE = 'environment.yaml'
 CONFIGURATION_SECTION = os.environ.get('COVID_APP_ENV', 'local')
@@ -35,10 +36,12 @@ with open(CONFIGURATION_FILE, 'r') as file:
     config = yaml.safe_load(file)[CONFIGURATION_SECTION]
 
 # Set up as before application directory
+# TODO: to remove, because of no use if app correctly started
 os.chdir(config['directory']['application'])
 
 
 #Settings
+# TODO: to remove, no usage in dash app, only in notebooks
 pd.set_option('display.max_columns', 20)
 
 
@@ -89,4 +92,12 @@ def display_page(pathname):
   
 
 if __name__ == '__main__':
-    app.run_server()
+
+    port = config.get('port', 8050)
+    debug = config.get('debug', False)
+
+    app.run_server(
+        debug=debug,
+	port=port,
+    )
+
