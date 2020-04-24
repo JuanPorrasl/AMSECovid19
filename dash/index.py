@@ -3,9 +3,10 @@
 #####################################################################
 
 #Loading datas
+import logging
 import os
 import pathlib
-os.chdir("D:/Utilisateur/Documents/Documents/Cours/AMSE M2 S4/COVID19/AMSECovid19/dash")
+import yaml
 
 import dash
 import pandas as pd
@@ -25,9 +26,20 @@ import time
 from app import app
 from pages import page_france, page_brazil, page_worldwide, page_analysis
 
+# Reading environment file for configuration
+CONFIGURATION_FILE = 'environment.yaml'
+CONFIGURATION_SECTION = os.environ.get('COVID_APP_ENV', 'local')
+
+logging.info('Reading configuration file')
+with open(CONFIGURATION_FILE, 'r') as file:
+    config = yaml.safe_load(file)[CONFIGURATION_SECTION]
+
+# Set up as before application directory
+os.chdir(config['directory']['application'])
+
+
 #Settings
 pd.set_option('display.max_columns', 20)
-
 
 
 #Navbar
