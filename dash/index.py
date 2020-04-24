@@ -22,7 +22,7 @@ import urllib.request
 import datetime
 import time
 
-from app import app
+from app import app, auth
 from pages import page_france, page_brazil, page_worldwide, page_analysis
 
 #Settings
