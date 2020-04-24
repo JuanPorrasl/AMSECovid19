@@ -13,7 +13,7 @@ app.config.suppress_callback_exceptions = True
 
 
 if os.environ.get('COVID_APP_ENV', 'local') != 'local':
-   from ..confidential.secrets import VALID_USERNAME_PASSWORD_PAIRS
+   from confidential.secrets import VALID_USERNAME_PASSWORD_PAIRS
 else:
    from local_env import VALID_USERNAME_PASSWORD_PAIRS
 

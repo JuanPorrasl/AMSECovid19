@@ -7,12 +7,13 @@ local:
 
 staging:
   directory:
-    application: '/home/debian/covid-app-staging' 
+    application: '/home/debian/covid-app/staging' 
 
 
 production:
   directory:
-    application: '/home/debian/covid-app' 
+    application: '/home/debian/covid-app/production' 
 
+  host: '0.0.0.0'
   port: 80
-
+  
