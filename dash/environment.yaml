@@ -14,5 +14,6 @@ production:
   directory:
     application: '/home/debian/covid-app/production' 
 
+  host: '0.0.0.0'
   port: 80
-
+  

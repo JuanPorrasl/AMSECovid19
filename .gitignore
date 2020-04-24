@@ -1,10 +1,11 @@
 # Project template specifics
 /_can_be_deleted/
 /confidential/
+confidential/
 /data/
 /notebooks/
 secrets.yaml
-
+secrets.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
