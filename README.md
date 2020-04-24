@@ -11,7 +11,7 @@ Project Organization
     ├── README.md          <- The top-level README for developers using this project.
     │
     ├── confidential        <- Secret folder NOT ON GITHUB 
-    │   └── dash_access.py  <- Secret script where ID and password are saved. Please, create your file     │                          with following elements: DASHBOARD_ACCESS = {'USERNAME': 'PASSWORD'}
+    │   └── secrets.py      <- Secret script where ID and password are saved. Please, create your file         │                          with following elements: DASHBOARD_ACCESS = {'USERNAME': 'PASSWORD'}
     │
     ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
     │

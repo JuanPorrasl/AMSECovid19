@@ -9,11 +9,11 @@ server = app.server
 app.config.suppress_callback_exceptions = True
 
 sys.path.append('../')
-from confidential.dash_access import DASHBOARD_ACCESS
+from confidential.secrets import VALID_USERNAME_PASSWORD_PAIRS
 
 auth = dash_auth.BasicAuth(
     app,
-    DASHBOARD_ACCESS
+    VALID_USERNAME_PASSWORD_PAIRS
 )
 
 
