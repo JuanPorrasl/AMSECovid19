@@ -1,6 +1,6 @@
 local:
   directory:
-    application: 'D:/Utilisateur/Documents/Documents/Cours/AMSE M2 S4/COVID19/AMSECovid19/dash' 
+    application: './' 
 
 
 staging:
