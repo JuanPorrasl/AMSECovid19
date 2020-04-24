@@ -1,0 +1,13 @@
+local:
+  directory:
+    application: 'D:/Utilisateur/Documents/Documents/Cours/AMSE M2 S4/COVID19/AMSECovid19/dash' 
+
+
+staging:
+  directory:
+    application: '/home/debian/covid-app-staging' 
+
+
+production:
+  directory:
+    application: '/home/debian/covid-app' 
