@@ -1,6 +1,8 @@
 local:
   directory:
-    application: 'D:/Utilisateur/Documents/Documents/Cours/AMSE M2 S4/COVID19/AMSECovid19/dash' 
+    application: './' 
+
+  debug: True
 
 
 staging:
@@ -11,3 +13,6 @@ staging:
 production:
   directory:
     application: '/home/debian/covid-app' 
+
+  port: 80
+
