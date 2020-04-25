@@ -83,7 +83,7 @@ footer = dbc.Row(
                 dbc.Col([
                     dbc.NavbarSimple(
                         children=[
-                            dbc.NavItem(dbc.NavLink("Mention Légales", href="#")),
+                            dbc.NavItem(dbc.NavLink("Legal notice", href="#")),
                             dbc.NavItem(dbc.NavLink("AMSE", href="https://www.amse-aixmarseille.fr/fr")),
                             dbc.NavItem(dbc.NavLink("AMU", href="https://www.univ-amu.fr/")),
                             dbc.NavItem(dbc.NavLink("Contact", href="#")),
