@@ -27,6 +27,9 @@ from app import app, auth
 from pages import page_france, page_brazil, page_worldwide, page_analysis
 
 
+# Exposing server for gunicorn
+server = app.server
+
 # Reading environment file for configuration
 CONFIGURATION_FILE = 'environment.yaml'
 CONFIGURATION_SECTION = os.environ.get('COVID_APP_ENV', 'local')
