@@ -70,10 +70,41 @@ navbar = dbc.NavbarSimple(
     color="#384259",
     dark=True,
 )
+
+footer = dbc.Row(
+        dbc.Container([
+            dbc.Row([
+                dbc.Col([
+                    dbc.NavLink("Sponsored & supported by Equancy", href="http://www.equancy.com", style={'color':'rgba(0,0,0,.5)'}),
+                    ],
+                    className="mt-2",
+                    md=7,
+                ),
+                dbc.Col([
+                    dbc.NavbarSimple(
+                        children=[
+                            dbc.NavItem(dbc.NavLink("Mention Légales", href="#")),
+                            dbc.NavItem(dbc.NavLink("AMSE", href="https://www.amse-aixmarseille.fr/fr")),
+                            dbc.NavItem(dbc.NavLink("AMU", href="https://www.univ-amu.fr/")),
+                            dbc.NavItem(dbc.NavLink("Contact", href="#")),
+                        ],
+                    )],
+                    md=5,
+                ),
+            ])
+        ],
+    ),
+    style={"background":"#f8f9fa"}
+)
+#justify="center",
+#className="mt-4",
+#style={"background":"#f8f9fa"}
+
                 
 app.layout = (
         html.Div(children=[navbar,
                         dcc.Location(id="url", refresh=False), html.Div(id="page-content"),
+                        footer
                 ],
                 style={"background":"white", "margin-top:":"0"}
         )
@@ -93,6 +124,11 @@ def display_page(pathname):
     else:
         return page_worldwide.body_worldwide
   
+#Favicon
+@server.route('/favicon.ico')
+def favicon():
+    return flask.send_from_directory(os.path.join(server.root_path, 'static'),
+                                     'favicon.ico')
 
 if __name__ == '__main__':
 
@@ -100,7 +136,7 @@ if __name__ == '__main__':
     debug = config.get('debug', False)
 
     app.run_server(
-        host=config.get('host', '127.0.0.0'),
+        host=config.get('host', '127.0.0.1'),
         debug=debug,
         port=port,
     )

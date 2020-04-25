@@ -17,6 +17,8 @@ Project Organization
     │
     ├── dash               <- Main folder of the dashboard
     │   ├── app.py                 <- Tool script to allow dashboard in multiple files with callbacks.
+    │   ├── assets                  
+    │   │   └── favicon.ico        <- Junior Data Analysts Favicon
     │   ├── cleaning_data.py       <- Cleaning datas for the index page
     │   ├── cleaning_data_br.py    <- Cleaning datas for the brazil page
     │   ├── cleaning_data_fr.py    <- Cleaning datas for the france page
