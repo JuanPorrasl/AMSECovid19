@@ -136,7 +136,7 @@ if __name__ == '__main__':
     debug = config.get('debug', False)
 
     app.run_server(
-        host=config.get('host', '127.0.0.1'),
+        host=config.get('host', '127.0.0.0'),
         debug=debug,
         port=port,
     )
