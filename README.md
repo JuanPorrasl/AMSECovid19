@@ -30,10 +30,11 @@ Project Organization
     │   │   └── working            <- Temporary folder for working datas. Supose to be empty at the end
     │   │
     │   ├── pages                 
-    │   │   ├── page_analysis.py   <- Content of the page "Global Analysis"
-    │   │   ├── page_brazil.py     <- Content of the page "brazil"
-    │   │   ├── page_france.py     <- Content of the page "france"
-    │   │   └── page_worldwide.py  <- Content of the main page
+    │   │   ├── page_analysis.py    <- Content of the page "Global Analysis"
+    │   │   ├── page_brazil.py      <- Content of the page "brazil"
+    │   │   ├── page_france.py      <- Content of the page "france"
+    │   │   ├── page_legalnotice.py <- Content of the page "legal"
+    │   │   └── page_worldwide.py   <- Content of the main page
     │   │
     │   └── index.py               <- Inital script to run for displaying Dashboad.
     │

@@ -24,7 +24,7 @@ import datetime
 import time
 
 from app import app, auth
-from pages import page_france, page_brazil, page_worldwide, page_analysis
+from pages import page_france, page_brazil, page_worldwide, page_analysis, page_legalnotice
 
 
 # Exposing server for gunicorn
@@ -65,7 +65,7 @@ navbar = dbc.NavbarSimple(
             label="Countries",
         ),
     ],
-    brand="Covid 19 Dashboard",
+    brand="AMSE Student Covid19 Dashboard",
     brand_href="/",
     color="#384259",
     dark=True,
@@ -83,7 +83,7 @@ footer = dbc.Row(
                 dbc.Col([
                     dbc.NavbarSimple(
                         children=[
-                            dbc.NavItem(dbc.NavLink("Legal notice", href="#")),
+                            dbc.NavItem(dbc.NavLink("Legal notice", href="/legal")),
                             dbc.NavItem(dbc.NavLink("AMSE", href="https://www.amse-aixmarseille.fr/fr")),
                             dbc.NavItem(dbc.NavLink("AMU", href="https://www.univ-amu.fr/")),
                             dbc.NavItem(dbc.NavLink("Contact", href="#")),
@@ -121,6 +121,8 @@ def display_page(pathname):
         return page_brazil.create_layout(app)
     if pathname == "/global":
         return page_analysis.create_layout(app)
+    if pathname == "/legal":
+        return page_legalnotice.create_layout(app)
     else:
         return page_worldwide.body_worldwide
   

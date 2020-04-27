@@ -25,8 +25,6 @@ dropdown_options = [
         {'label':i, 'value': i} for i in df["Country_Region"].unique()
         ]
 
-
-
 body_worldwide = dbc.Container(
         [
             dbc.Container(
@@ -55,7 +53,7 @@ body_worldwide = dbc.Container(
                 fluid=False,
                 className="mb-2"
             ),
-            #CARDS ROW
+            #Cards
             dbc.Row(
                 [
                     dbc.Col(
@@ -65,7 +63,7 @@ body_worldwide = dbc.Container(
                                     html.P("Total Confirmed", className="card-title"),
                                     html.H4(id="card-confirmed", className="card-text"),
                             ]),
-                            #color="danger",
+                            #Total confirmed,
                             inverse=True, className="mb-1",
                             style={"text-align":"center", 'background-color': "#384259"}
                         ),
@@ -74,7 +72,7 @@ body_worldwide = dbc.Container(
                                     html.P("Total Recovered", className="card-title"),
                                     html.H4(id="card-recovered", className="card-text"),
                             ]),
-                            #color="primary",
+                            #Total recovered
                             inverse=True, className="mb-1",
                             style={"text-align":"center", 'background-color': "#7ac7c4"}
                         ),
@@ -83,7 +81,7 @@ body_worldwide = dbc.Container(
                                     html.P("Total Deaths", className="card-title"),
                                     html.H4(id="card-deaths", className="card-text"),
                             ]),
-                            #color="dark",
+                            #Total deaths
                             inverse=True, className="mb-2",
                             style={"text-align":"center", 'background-color': "#f73859"}
                         )
@@ -208,9 +206,9 @@ def update_map(map_slider):
               [Input('selected_country', 'value')])
 def update_daily_cases(selected_country):
     dct = {
-        'Confirmed': {'title': 'Daily new cases', 'color': '#dc3545'},
-        'Recovered': {'title': 'Daily recovered cases', 'color': '#007bff'},
-        'Deaths': {'title': "Daily new deaths", 'color': '#343a40'}
+        'Confirmed': {'title': 'Daily new cases', 'color': '#384259'},
+        'Recovered': {'title': 'Daily recovered cases', 'color': '#7ac7c4'},
+        'Deaths': {'title': "Daily new deaths", 'color': '#f73859'}
     }
     if selected_country != 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX':
         df_data=df[df["Country_Region"]==selected_country].groupby(["Last_Update"]).sum()
