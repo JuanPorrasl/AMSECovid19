@@ -120,16 +120,6 @@ body_worldwide = dbc.Container(
                                 type="default",
                                 children=dcc.Graph(id='daily-cases', config=config)
                             ),
-                        dcc.Loading(
-                                id="loading-1",
-                                type="default",
-                                children=dcc.Graph(id='daily-cases-recov', config=config)
-                            ),
-                        dcc.Loading(
-                                id="loading-1",
-                                type="default",
-                                children=dcc.Graph(id='daily-cases-deaths', config=config)
-                            ),
                         ],
                         md=6,
                     ),
@@ -140,13 +130,48 @@ body_worldwide = dbc.Container(
                                 type="default",
                                 children=dcc.Graph(id='cumulative-cases', config=config)
                             ),
+                        ],
+                        md=6,
+                    ),
+                ],
+                no_gutters=True,
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                        dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='daily-cases-recov', config=config)
+                            ),
+                        ],
+                        md=6,
+                    ),
+                    dbc.Col(
+                        [
                             dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='daily-cases-deaths', config=config)
+                            ),
+                        ],
+                        md=6,
+                    ),
+                ],
+                no_gutters=True,
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                        dcc.Loading(
                                 id="loading-1",
                                 type="default",
                                 children=dcc.Graph(id='infection-cases', config=config)
                             ),
                         ],
-                        md=6,
+                        md=12,
                     ),
                 ],
                 no_gutters=True,
@@ -156,6 +181,11 @@ body_worldwide = dbc.Container(
         fluid=True
     )
 
+
+                        
+                        
+                            
+                            
 
 @app.callback([Output('title-main', 'children'), Output('card-confirmed', 'children'), Output('card-recovered', 'children'), Output('card-deaths', 'children')],
               [Input('selected_country', 'value')])
@@ -211,7 +241,7 @@ def update_daily_cases(selected_country):
             layout_title_text=dct[col]['title']
         )
         fig.update_traces(marker_color=dct[col]['color'])
-        fig.update_layout(title_text=dct[col]['title'], yaxis=dict(range=[0, yaxis_max]), height=200, margin={"b":0})
+        fig.update_layout(title_text=dct[col]['title'], yaxis=dict(range=[0, yaxis_max]), height=300, margin={"b":0})
         return fig
     graphs = {col: bar_graph(values, col) for col in dct.keys()}    
     return graphs['Confirmed'], graphs['Recovered'], graphs['Deaths']
