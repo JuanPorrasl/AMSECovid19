@@ -24,7 +24,7 @@ import datetime
 import time
 
 from app import app, auth
-from pages import page_france, page_brazil, page_worldwide, page_analysis, page_legalnotice
+from pages import page_france, page_brazil, page_worldwide, page_analysis, page_legalnotice, page_US
 
 
 # Exposing server for gunicorn
@@ -58,7 +58,7 @@ navbar = dbc.NavbarSimple(
                 dbc.DropdownMenuItem("Detailed studies", header=True),
                 dbc.DropdownMenuItem("Brazil", href="/brazil"),
                 dbc.DropdownMenuItem("France", href="/france"),
-                dbc.DropdownMenuItem("United States", href="#"),
+                dbc.DropdownMenuItem("United States", href="/US"),
             ],
             nav=True,
             in_navbar=True,
@@ -119,6 +119,8 @@ def display_page(pathname):
         return page_france.create_layout(app)
     if pathname == "/brazil":
         return page_brazil.create_layout(app)
+    if pathname == "/US":
+        return page_US.create_layout(app)
     if pathname == "/global":
         return page_analysis.create_layout(app)
     if pathname == "/legal":
