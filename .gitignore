@@ -3,9 +3,15 @@
 /confidential/
 confidential/
 /data/
+/dash/data/external/cargos/archives/
+/dash/data/processed/CARGO_2010-2020.xlsx
+/dash/data/processed/VESSEL_2010-2020.xlsx
+
 /notebooks/
 secrets.yaml
 secrets.py
+
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
