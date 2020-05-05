@@ -37,6 +37,7 @@ files=os.listdir(path+folder[:-1])
 ls=[os.path.getmtime(path+folder+elem) for elem in files]
 
 last_file=pd.to_datetime(files[ls.index(max(ls))][-10:-4], format='%d%m%y')
+last_file_cargo=pd.to_datetime(files[ls.index(max(ls))][-10:-4], format='%d%m%y').strftime('%d/%m/%y')
 today=pd.Timestamp.today()
 
 if((last_file.year < today.year) | (last_file.week < (today.week-1))):
@@ -53,6 +54,7 @@ files=os.listdir(path+folder[:-1])
 ls=[os.path.getmtime(path+folder+elem) for elem in files]
 
 last_file=pd.to_datetime(files[ls.index(max(ls))][-10:-4], format='%d%m%y')
+last_file_vessels=pd.to_datetime(files[ls.index(max(ls))][-10:-4], format='%d%m%y').strftime('%d/%m/%y')
 today=pd.Timestamp.today()
 
 if((last_file.year < today.year) | (last_file.week < (today.week-1))):
@@ -176,7 +178,7 @@ cargo=cargo[(~cargo.MRS.isna()) & (~cargo.FOS.isna()) & ((cargo.MRS!=0) & (cargo
 cargo.date=cargo.date.dt.to_period('M').dt.to_timestamp()
 
 
-
+#Badges last updates
 
 
 
