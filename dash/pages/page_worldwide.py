@@ -18,7 +18,7 @@ import plotly.express as px
 
 
 #Python Script
-from cleaning_datas import df, today, yesterday, config
+from cleaning_datas import df, today, yesterday, last_file_hopkins, config
 
 ############# PLOT PART #############
 #Dropdown for neighbourhood
@@ -34,7 +34,8 @@ body_worldwide = dbc.Container(
                     [
                         dbc.Col(
                             [
-                                html.H2(id="title-main")
+                                html.H2(id="title-main"),
+                                html.P(["Latest Updates: ",dbc.Badge("Hopkins: "+str(last_file_hopkins), color="secondary", className="mr-1")])
                             ],
                             md=9,
                         ),

@@ -30,7 +30,13 @@ covid_state_br['text'] = 'State: ' + covid_state_br['state'].astype(str) + '<br>
     'Lethality Rate: ' + covid_state_br['lethality'].astype(str) + '%' + '<br>' + \
     'Population (2019): ' + covid_state_br['estimated_population_2019'].astype(str)
 
-
+#Create badges last update
+badges_updates=covid_state_br.groupby(["state"], as_index=False).agg({"date":"max"})
+badges_updates.date=badges_updates.date.dt.strftime('%d/%m/%y')
+badges_updates=badges_updates.set_index("state")
+badges_updates=badges_updates.to_dict()["date"]
+badges_updates=[dbc.Badge(str(elem)+": "+str(badges_updates[elem]), color="secondary", className="mr-1") for elem in badges_updates]
+badges_updates.insert(0,"Latest Updates: ")
 
 def create_layout(app):
     body = dbc.Container(
@@ -40,11 +46,18 @@ def create_layout(app):
                 [
                     dbc.Col(
                         [
-                            html.H2("Detailed Brazil analysis")
+                            html.H2("Detailed Brazil analysis"),
+                            html.P(badges_updates)
+    
                         ],
-                        xl=4,
+                        xl=12,
                         
                     ),
+                ],
+                justify="center",
+            ),
+            dbc.Row(
+                [
                     dbc.Col(
                         [
                             dcc.Slider(
@@ -56,7 +69,7 @@ def create_layout(app):
                                 step=None
                             ),
                         ],
-                        xl=8,
+                        xl=12,
                     ),
                 ],
                 justify="center",

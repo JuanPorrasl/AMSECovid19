@@ -14,7 +14,7 @@ from app import app
 import plotly.graph_objects as go
 import plotly.express as px
 
-from cleaning_datas_fr import hospital, today, counties, config
+from cleaning_datas_fr import hospital, today, counties, last_file_france, config
 
 
 #Hospitalisations
@@ -49,7 +49,7 @@ graph_hosp.add_trace(go.Scatter(
                 line_color='#ffdb99',
                 opacity=1))
 # Use date string to set xaxis range
-graph_hosp.update_layout(height=200, title_text="Hospitalization evolution in France", margin={"r":0,"t":40,"l":0,"b":0})
+graph_hosp.update_layout(height=200, template="plotly_white", title_text="Hospitalization evolution in France", margin={"r":0,"t":40,"l":0,"b":0})
 
 
 #Daily hospitalisation
@@ -71,7 +71,7 @@ daily_hosp.add_trace(go.Bar(
                 marker_color='orange',
                 opacity=0.8))
 # Use date string to set xaxis range
-daily_hosp.update_layout(height=200, title_text="Daily evolution of the intensive care units and hospitalizations", margin={"r":0,"t":40,"l":0,"b":0})
+daily_hosp.update_layout(height=200, template="plotly_white", title_text="Daily evolution of the intensive care units and hospitalizations", margin={"r":0,"t":40,"l":0,"b":0})
 
 
 
@@ -85,6 +85,7 @@ graph_pie = px.sunburst(df_pie, path=['sexe', 'variable'], values='value', color
 
 
 
+
 def create_layout(app):
     body = dbc.Container(
         [
@@ -93,11 +94,17 @@ def create_layout(app):
                 [
                     dbc.Col(
                         [
-                            html.H2("Detailed France analysis")
+                            html.H2("Detailed France analysis"),
+                            html.P(["Latest Update: ",dbc.Badge("Data Gouv: "+str(last_file_france), color="secondary", className="mr-1")])
                         ],
-                        xl=4,
+                        xl=12,
                         
                     ),
+                ],
+                justify="center",
+            ),
+            dbc.Row(
+                [
                     dbc.Col(
                         [
                             dcc.Slider(
@@ -109,7 +116,7 @@ def create_layout(app):
                                 step=None
                             ),
                         ],
-                        xl=8,
+                        xl=12,
                     ),
                 ],
                 justify="center",
