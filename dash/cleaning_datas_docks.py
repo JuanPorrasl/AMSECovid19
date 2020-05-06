@@ -4,7 +4,13 @@ import os
 from datetime import datetime
 import plotly.graph_objects as go
 
-from confidential.secrets import url_cargo, url_vessels
+#Cases where the client does not have access to the links Cargo
+try:
+    from confidential.secrets import url_cargo, url_vessels
+except:
+    url_cargo=0
+    url_vessels=0
+    print("Cargos update links are not accessible. Did you set up the secrets.py file correctly? More information in the READ.ME")
 
 path="data/external/cargos/"
 config = {'displayModeBar': False}
@@ -20,8 +26,7 @@ def conversion(old):
 
 ####### First part : Update data
 
-#Check folder exists
-ls=[path+"UpdateCargo",path+"UpdateVessels"]
+ls=[path+"UpdateCargo",path+"UpdateVessels",path+"archives",path+"archives/HistoriqueMarchandises",path+"archives/HistoriqueNavires"]
 for elem in ls:
     if(os.path.isdir(elem)==0):
         try:
@@ -29,6 +34,10 @@ for elem in ls:
         except OSError:
             print ("Creation of the directory failed")
             
+#Create files to avoid bugs in HistoriqueNavires
+if len(os.listdir(path+"archives/HistoriqueNavires"))==0:
+    pd.DataFrame(data=[["03/01/2010 09:00","04/01/2010 04:00","HANJINAG - HANJIN","HANJINAG - HANJIN","ATP00014315","HNHL0049W","HNHL0049E","HANJIN HELSINKI","FOS","Validée","Validée"]], columns=["ARRIVEE","DEPART","Rep. Transp EM","Rep. Transp SM","id.AP+","Référence Arrivée","Référence Départ","Nom Navire","Bassin Touché","Statut Arrivée","Statut Départ"]).to_csv(path+'archives/HistoriqueNavires/AMU_VESSEL_2010.txt', sep='	', encoding = "ISO-8859-1")
+
 ## Update Cargo trafic
 #Read files with "cargo" in title
 folder="UpdateCargo/"
@@ -40,13 +49,16 @@ last_file=pd.to_datetime(files[ls.index(max(ls))][-10:-4], format='%d%m%y')
 last_file_cargo=pd.to_datetime(files[ls.index(max(ls))][-10:-4], format='%d%m%y').strftime('%d/%m/%y')
 today=pd.Timestamp.today()
 
-if((last_file.year < today.year) | (last_file.week < (today.week-1))):
-    cargo_update=pd.read_csv(url_cargo, encoding = "ISO-8859-1", sep=";")
-    new_file=pd.to_datetime(cargo_update["Date fin"][1]).strftime(folder[:-1]+'S%W%d%m%y.csv')
-    #Save if not exist
-    if new_file not in os.listdir(path+folder):
-        cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
-        
+#check if client can access to the links
+if url_cargo != 0:
+    #check time of precedent file
+    if((last_file.year < today.year) | (last_file.week < (today.week-1))):
+        cargo_update=pd.read_csv(url_cargo, encoding = "ISO-8859-1", sep=";")
+        new_file=pd.to_datetime(cargo_update["Date fin"][1]).strftime(folder[:-1]+'S%W%d%m%y.csv')
+        #Save if not exist
+        if new_file not in os.listdir(path+folder):
+            cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
+
 ## Update vessels trafic
 folder="UpdateVessels/"
 files=os.listdir(path+folder[:-1])
@@ -57,24 +69,33 @@ last_file=pd.to_datetime(files[ls.index(max(ls))][-10:-4], format='%d%m%y')
 last_file_vessels=pd.to_datetime(files[ls.index(max(ls))][-10:-4], format='%d%m%y').strftime('%d/%m/%y')
 today=pd.Timestamp.today()
 
-if((last_file.year < today.year) | (last_file.week < (today.week-1))):
-    cargo_update=pd.read_csv(url_vessels, encoding = "ISO-8859-1", sep=";")
-    new_file=pd.Timestamp.today().strftime(folder[:-1]+'S%W%d%m%y.csv')
-    #Save if not exist
-    if new_file not in os.listdir(path+folder):
-        #Remove previous file
-        os.remove(path+folder+files[ls.index(max(ls))])
-        #Save new file
-        cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
+if url_vessels != 0:
+    if((last_file.year < today.year) | (last_file.week < (today.week-1))):
+        cargo_update=pd.read_csv(url_vessels, encoding = "ISO-8859-1", sep=";")
+        new_file=pd.Timestamp.today().strftime(folder[:-1]+'S%W%d%m%y.csv')
+        #Save if not exist
+        if new_file not in os.listdir(path+folder):
+            #Remove previous file
+            os.remove(path+folder+files[ls.index(max(ls))])
+            #Save new file
+            cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
 
-
+#Correction if file doesn't exist to force the condition IF == TRUE
+if os.path.isfile(path+'../../processed/CARGO_2010-2020.xlsx'):
+    datetime_cargos=datetime.fromtimestamp(os.path.getmtime(path+'../../processed/CARGO_2010-2020.xlsx')) 
+else:
+    datetime_cargos=datetime.fromtimestamp(1326244364)
+    
 ## Update main file: Cargo
 
 folder="UpdateCargo/"
 ## IF (Last Update file time > Main excel file time) => We update the main file
-if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os.listdir(path+folder[:-1])])) > datetime.fromtimestamp(os.path.getmtime(path+'../../processed/CARGO_2010-2020.xlsx')):
+if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os.listdir(path+folder[:-1])])) > datetime_cargos:
     #Read previous file
-    cargo=pd.read_excel(path+'../../processed/CARGO_2010-2020.xlsx', encoding = "ISO-8859-1", index_col=0).reset_index(drop=True)
+    if os.path.isfile(path+'../../processed/CARGO_2010-2020.xlsx'):
+        cargo=pd.read_excel(path+'../../processed/CARGO_2010-2020.xlsx', encoding = "ISO-8859-1", index_col=0).reset_index(drop=True)
+    else:
+        cargo=pd.DataFrame()
     #Read update files
     files=os.listdir(path+folder)
     ls=[i for i in os.listdir(path+folder)]
@@ -102,21 +123,28 @@ if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os
     cargo=cargo.reset_index(drop=True)
     #Save
     cargo.to_excel(path+'../../processed/CARGO_2010-2020.xlsx', encoding = "ISO-8859-1")
-
-
+    
+#Correction if file doesn't exist to force the condition IF == TRUE
+if os.path.isfile(path+'../../processed/VESSEL_2010-2020.xlsx'):
+    datetime_vessels=datetime.fromtimestamp(os.path.getmtime(path+'../../processed/VESSEL_2010-2020.xlsx'))
+else:
+    datetime_vessels=datetime.fromtimestamp(1326244364)
+    
 ## Update main file: Vessels
 folder="UpdateVessels/"
 #If Update time > Main file time
-if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os.listdir(path+folder[:-1])])) > datetime.fromtimestamp(os.path.getmtime(path+'../../processed/VESSEL_2010-2020.xlsx')):
+if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os.listdir(path+folder[:-1])])) > datetime_vessels:
     #Read archives not CI5
     files=os.listdir(path+"archives/HistoriqueNavires")
     ls=[i for i in files if os.path.isfile(os.path.join(path+"archives/HistoriqueNavires",i)) and 'AMU' in i]
-
+    
+    #Read historical datas
     df=pd.DataFrame()
     for elem in ls:
         df_add=pd.read_csv(path+'archives/HistoriqueNavires/'+elem, sep="	", encoding = "ISO-8859-1")
         df=pd.concat([df,df_add])
-
+    
+    #Cleaning
     df=df[["ARRIVEE","DEPART","Bassin Touché"]]
     df=df.rename(columns={"ARRIVEE":"cal_eta","DEPART":"cal_etd","Bassin Touché":"cal_place_code"})
     df.cal_eta=pd.to_datetime(df.cal_eta, format='%d/%m/%Y %H:%M')
@@ -133,7 +161,8 @@ if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os
         vessels_update_add=pd.read_csv(path+folder+elem, encoding = "ISO-8859-1", sep=";", index_col=0)
         vessels_update_add["date"]=pd.to_datetime(elem[-10:-4], format='%d%m%y')
         vessels_update=pd.concat([vessels_update_add,vessels_update])
-
+    
+    #Cleaning
     vessels_update=vessels_update[["cal_eta","cal_etd","cal_place_code","cal_last_place_code","cal_next_place_code"]]
     vessels_update=vessels_update[(vessels_update.cal_place_code=="FRFOS") | (vessels_update.cal_place_code=="FRMRS")]
 
