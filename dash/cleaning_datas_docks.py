@@ -54,7 +54,7 @@ if url_cargo != 0:
     #check time of precedent file
     if((last_file.year < today.year) | (last_file.week < (today.week-1))):
         cargo_update=pd.read_csv(url_cargo, encoding = "ISO-8859-1", sep=";")
-        new_file=pd.to_datetime(cargo_update["Date fin"][1]).strftime(folder[:-1]+'S%W%d%m%y.csv')
+        new_file=pd.to_datetime(cargo_update["Date fin"][1], format="%d/%m/%Y").strftime(folder[:-1]+'S%W%d%m%y.csv')
         #Save if not exist
         if new_file not in os.listdir(path+folder):
             cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
@@ -70,7 +70,7 @@ last_file_vessels=pd.to_datetime(files[ls.index(max(ls))][-10:-4], format='%d%m%
 today=pd.Timestamp.today()
 
 if url_vessels != 0:
-    if((last_file.year < today.year) | (last_file.week < (today.week-1))):
+    if((last_file.year < today.year) | (last_file.week < today.week)):
         cargo_update=pd.read_csv(url_vessels, encoding = "ISO-8859-1", sep=";")
         new_file=pd.Timestamp.today().strftime(folder[:-1]+'S%W%d%m%y.csv')
         #Save if not exist
