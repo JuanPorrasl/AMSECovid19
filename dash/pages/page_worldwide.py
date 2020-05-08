@@ -5,6 +5,7 @@ import os
 
 import pandas as pd
 import numpy as np
+from astropy.convolution import convolve, Gaussian1DKernel
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
@@ -17,15 +18,13 @@ import plotly.express as px
 
 
 #Python Script
-from cleaning_datas import df, today, yesterday, config
+from cleaning_datas import df, today, yesterday, last_file_hopkins, config
 
 ############# PLOT PART #############
 #Dropdown for neighbourhood
 dropdown_options = [
         {'label':i, 'value': i} for i in df["Country_Region"].unique()
         ]
-
-
 
 body_worldwide = dbc.Container(
         [
@@ -35,7 +34,8 @@ body_worldwide = dbc.Container(
                     [
                         dbc.Col(
                             [
-                                html.H2(id="title-main")
+                                html.H2(id="title-main"),
+                                html.P(["Latest Updates: ",dbc.Badge("Hopkins: "+str(last_file_hopkins), color="secondary", className="mr-1")])
                             ],
                             md=9,
                         ),
@@ -55,7 +55,7 @@ body_worldwide = dbc.Container(
                 fluid=False,
                 className="mb-2"
             ),
-            #CARDS ROW
+            #Cards
             dbc.Row(
                 [
                     dbc.Col(
@@ -65,7 +65,7 @@ body_worldwide = dbc.Container(
                                     html.P("Total Confirmed", className="card-title"),
                                     html.H4(id="card-confirmed", className="card-text"),
                             ]),
-                            #color="danger",
+                            #Total confirmed,
                             inverse=True, className="mb-1",
                             style={"text-align":"center", 'background-color': "#384259"}
                         ),
@@ -74,7 +74,7 @@ body_worldwide = dbc.Container(
                                     html.P("Total Recovered", className="card-title"),
                                     html.H4(id="card-recovered", className="card-text"),
                             ]),
-                            #color="primary",
+                            #Total recovered
                             inverse=True, className="mb-1",
                             style={"text-align":"center", 'background-color': "#7ac7c4"}
                         ),
@@ -83,7 +83,7 @@ body_worldwide = dbc.Container(
                                     html.P("Total Deaths", className="card-title"),
                                     html.H4(id="card-deaths", className="card-text"),
                             ]),
-                            #color="dark",
+                            #Total deaths
                             inverse=True, className="mb-2",
                             style={"text-align":"center", 'background-color': "#f73859"}
                         )
@@ -162,11 +162,31 @@ body_worldwide = dbc.Container(
                 ],
                 no_gutters=True,
             ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                        dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='infection-cases', config=config)
+                            ),
+                        ],
+                        md=12,
+                    ),
+                ],
+                no_gutters=True,
+            ),
         ],
         className="mt-4",
         fluid=True
     )
 
+
+                        
+                        
+                            
+                            
 
 @app.callback([Output('title-main', 'children'), Output('card-confirmed', 'children'), Output('card-recovered', 'children'), Output('card-deaths', 'children')],
               [Input('selected_country', 'value')])
@@ -208,48 +228,79 @@ def update_map(map_slider):
               [Input('selected_country', 'value')])
 def update_daily_cases(selected_country):
     dct = {
-        'Confirmed': {'title': 'Daily new cases', 'color': '#dc3545'},
-        'Recovered': {'title': 'Daily recovered cases', 'color': '#007bff'},
-        'Deaths': {'title': "Daily new deaths", 'color': '#343a40'}
+        'Confirmed': {'title': 'Daily new cases', 'color': '#384259'},
+        'Recovered': {'title': 'Daily recovered cases', 'color': '#7ac7c4'},
+        'Deaths': {'title': "Daily new deaths", 'color': '#f73859'}
     }
-    if selected_country != 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX':
-        df_data=df[df["Country_Region"]==selected_country].groupby(["Last_Update"]).sum()
-        labels=df_data.index[1:]
-        values=df_data.diff()     
-        def bar_graph(values, col):
-            yaxis_max = values[col].max()*1.1
-            fig = go.Figure(
-                data=[go.Bar(x=labels, y=values[col].tolist())],
-                layout_title_text=dct[col]['title']
-            )
-            fig.update_traces(marker_color=dct[col]['color'])
-            fig.update_layout(title_text=dct[col]['title'], yaxis=dict(range=[0, yaxis_max]), height=300, margin={"b":0})
-            return fig
-        graphs = {col: bar_graph(values, col) for col in dct.keys()}    
-        return graphs['Confirmed'], graphs['Recovered'], graphs['Deaths']
-    else:
-        _per_continent = {
-            _type: pd.crosstab(
-                index=df['Last_Update'], 
-                columns=df['Continent'], 
-                values=df[_type], 
-                aggfunc='sum'
-            ).fillna(0).diff()
-            for _type in dct.keys()
-        }
-        labels = df['Last_Update'].astype(str).tolist()
-        colors = px.colors.diverging.Earth
-        continents = df['Continent'].dropna().unique()
-        def bar_graph_continent(_type):
-            bars = [
-                go.Bar(name=continent, x=labels, y=_per_continent[_type][continent].tolist(), marker_color=color)
-                for continent, color in zip(continents, colors)
-            ]
-            fig = go.Figure(data=bars)
-            fig.update_layout(barmode='stack', title_text=dct[_type]['title'])
-            return fig
-        graphs = {_type: bar_graph_continent(_type) for _type in dct.keys()}    
-        return graphs['Confirmed'], graphs['Recovered'], graphs['Deaths']
+    df_data=df[df["Country_Region"]==selected_country].groupby(["Last_Update"]).sum()
+    labels=df_data.index[1:]
+    values=df_data.diff()     
+    def bar_graph(values, col):
+        yaxis_max = values[col].max()*1.1
+        fig = go.Figure(
+            data=[go.Bar(x=labels, y=values[col].tolist())],
+            layout_title_text=dct[col]['title']
+        )
+        fig.update_traces(marker_color=dct[col]['color'])
+        fig.update_layout(title_text=dct[col]['title'], yaxis=dict(range=[0, yaxis_max]), height=300, margin={"b":0})
+        return fig
+    graphs = {col: bar_graph(values, col) for col in dct.keys()}    
+    return graphs['Confirmed'], graphs['Recovered'], graphs['Deaths']
+
+
+@app.callback(Output('infection-cases', 'figure'),
+              [Input('selected_country', 'value')])
+def infection_cases(selected_country):
+    gauss_kernel = Gaussian1DKernel(4)
+    
+    df_data=df[df.Country_Region==selected_country].groupby(["Last_Update"])["Confirmed"].sum().diff()
+    labels=pd.to_datetime(df_data.index[1:])
+    
+    values=(convolve(df_data[1:], gauss_kernel)/convolve(df_data[1:].shift(5), gauss_kernel))[5:]
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=labels[7:], y=values,
+        line=dict(color='red'),
+        name="Rate"
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=labels, y=[1]*len(labels),
+        line=dict(color='green', dash='dash'),
+        showlegend=False
+    ))
+    
+    # Add range slider
+    fig.update_layout(
+        yaxis=dict(range=[0, 3]),
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="MTD",
+                         step="month",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=3,
+                         label="3m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            type="date"
+        )
+    )
+    fig.update_layout(title_text="Average number of people infected by an infected individual", height=300, margin={"b":0})
+    return fig
 
 
 @app.callback(Output('cumulative-cases', 'figure'),

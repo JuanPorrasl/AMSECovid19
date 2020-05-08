@@ -15,3 +15,4 @@ for i in range(0,len(counties["features"])):
                counties["features"][i]["id"]=counties["features"][i]["properties"]["code"]   
                
 today=(hospital.jour==hospital.jour.max())
+last_file_france=pd.to_datetime(hospital.jour.max()).strftime("%d/%m/%y")

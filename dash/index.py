@@ -24,7 +24,7 @@ import datetime
 import time
 
 from app import app, auth
-from pages import page_france, page_brazil, page_worldwide, page_analysis
+from pages import page_france, page_brazil, page_docks, page_worldwide, page_analysis, page_legalnotice
 
 
 # Exposing server for gunicorn
@@ -43,11 +43,6 @@ with open(CONFIGURATION_FILE, 'r') as file:
 os.chdir(config['directory']['application'])
 
 
-#Settings
-# TODO: to remove, no usage in dash app, only in notebooks
-pd.set_option('display.max_columns', 20)
-
-
 #Navbar
 navbar = dbc.NavbarSimple(
     children=[
@@ -64,8 +59,17 @@ navbar = dbc.NavbarSimple(
             in_navbar=True,
             label="Countries",
         ),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("Economic Indicators", header=True),
+                dbc.DropdownMenuItem("port of Marseille/Fos", href="/docks"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="Indicators",
+        ),
     ],
-    brand="Covid 19 Dashboard",
+    brand="AMSE Student Covid19 Dashboard",
     brand_href="/",
     color="#384259",
     dark=True,
@@ -83,7 +87,7 @@ footer = dbc.Row(
                 dbc.Col([
                     dbc.NavbarSimple(
                         children=[
-                            dbc.NavItem(dbc.NavLink("Mention Légales", href="#")),
+                            dbc.NavItem(dbc.NavLink("Legal notice", href="/legal")),
                             dbc.NavItem(dbc.NavLink("AMSE", href="https://www.amse-aixmarseille.fr/fr")),
                             dbc.NavItem(dbc.NavLink("AMU", href="https://www.univ-amu.fr/")),
                             dbc.NavItem(dbc.NavLink("Contact", href="#")),
@@ -121,6 +125,10 @@ def display_page(pathname):
         return page_brazil.create_layout(app)
     if pathname == "/global":
         return page_analysis.create_layout(app)
+    if pathname == "/legal":
+        return page_legalnotice.create_layout(app)
+    if pathname == "/docks":
+        return page_docks.create_layout(app)
     else:
         return page_worldwide.body_worldwide
   
@@ -136,7 +144,7 @@ if __name__ == '__main__':
     debug = config.get('debug', False)
 
     app.run_server(
-        host=config.get('host', '127.0.0.0'),
+        host=config.get('host', '127.0.0.1'),
         debug=debug,
         port=port,
     )
