@@ -3,6 +3,10 @@ import numpy as np
 import os
 from datetime import datetime
 import plotly.graph_objects as go
+import time
+
+def timer():
+    return '['+datetime.now().strftime("%d/%m/%Y %H:%M:%S")+']'
 
 #Cases where the client does not have access to the links Cargo
 try:
@@ -25,7 +29,7 @@ def conversion(old):
     return (int(new[0])+int(new[1])/60.0+int(new[2])/3600.0) * direction[new_dir]
 
 ####### First part : Update data
-
+print(timer()+'[INFO] Check cargo files to update...')
 ls=[path+"UpdateCargo",path+"UpdateVessels",path+"archives",path+"archives/HistoriqueMarchandises",path+"archives/HistoriqueNavires"]
 for elem in ls:
     if(os.path.isdir(elem)==0):
@@ -123,6 +127,7 @@ if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os
     cargo=cargo.reset_index(drop=True)
     #Save
     cargo.to_excel(path+'../../processed/CARGO_2010-2020.xlsx', encoding = "ISO-8859-1")
+    print(timer()+'[INFO] Cargo files updated.')
     
 #Correction if file doesn't exist to force the condition IF == TRUE
 if os.path.isfile(path+'../../processed/VESSEL_2010-2020.xlsx'):
@@ -183,8 +188,10 @@ if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os
     df.to_excel(path+"../../processed/VESSEL_2010-2020.xlsx")
     #Get free RAM
     del(df, vessels_update, vessels_update_add, df_add)
+    print(timer()+'[INFO] Vessels files updated.')
 
 
+print(timer()+'[INFO] Loading cargos files')
 ####### Second part : Cleaning datas
 #Read cargo file
 cargo=pd.read_excel(path+"../../processed/CARGO_2010-2020.xlsx", encoding = "ISO-8859-1", index_col=0)
@@ -208,7 +215,6 @@ cargo.date=cargo.date.dt.to_period('M').dt.to_timestamp()
 
 
 #Badges last updates
-
 
 
 

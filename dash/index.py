@@ -24,7 +24,7 @@ import datetime
 import time
 
 from app import app, auth
-from pages import page_france, page_brazil, page_docks, page_worldwide, page_analysis, page_legalnotice
+from pages import page_france, page_brazil, page_docks, page_worldwide, page_analysis, page_legalnotice, page_pollution
 
 
 # Exposing server for gunicorn
@@ -62,7 +62,8 @@ navbar = dbc.NavbarSimple(
         dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem("Economic Indicators", header=True),
-                dbc.DropdownMenuItem("port of Marseille/Fos", href="/docks"),
+                dbc.DropdownMenuItem("Air pollution", href="/air_pollution"),
+                dbc.DropdownMenuItem("port of Marseille/Fos", href="/docks"), 
             ],
             nav=True,
             in_navbar=True,
@@ -129,6 +130,8 @@ def display_page(pathname):
         return page_legalnotice.create_layout(app)
     if pathname == "/docks":
         return page_docks.create_layout(app)
+    if pathname == "/air_pollution":
+        return page_pollution.create_layout(app)
     else:
         return page_worldwide.body_worldwide
   
