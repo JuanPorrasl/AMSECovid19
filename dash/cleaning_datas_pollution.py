@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-
+import plotly.graph_objects as go
 import time
 from datetime import datetime
 def timer():
@@ -28,7 +28,7 @@ def bar_color(x):
     return bar_value
 
 #Help plotting gauges
-def fig_gauge(country_name, NO2, row=0, col=0):
+def fig_gauge(fig, country_name, NO2, row=0, col=0):
     return fig.add_trace(go.Indicator(
     domain = {'row': row, 'column': col},
     value = NO2,
@@ -51,7 +51,7 @@ def safe_execute(x):
 
 print(timer()+'[INFO] Import air polution datas, this step can take a while...')
 #Get 120 lasts days
-max_day=[elem.strftime("archived_%Y_%m_%d.csv") for elem in pd.to_datetime(pd.Series(os.listdir(path+"archives/")), format="archived_%Y_%m_%d.csv").sort_values(ascending=False).reset_index(drop=True)[0:20]]
+max_day=[elem.strftime("archived_%Y_%m_%d.csv") for elem in pd.to_datetime(pd.Series(os.listdir(path+"archives/")), format="archived_%Y_%m_%d.csv").sort_values(ascending=False).reset_index(drop=True)[0:10]]
 max_day=[elem.split("_") for elem in max_day]
 max_day=[[elem.lstrip("0") for elem in max_day[i]] for i in range(0,len(max_day))]
 max_day=["_".join(max_day[i]) for i in range(0,len(max_day))]
@@ -70,5 +70,7 @@ except NameError:
     df=df.drop(columns=["year","month","day"])
     #Columns for weighted computation
     df["calcul"]=df.NO2*df.counter
-    
+    #Put full names for countries
+    df["cc_name"]=[CC[elem] if elem != "Undefined" else "" for elem in df.cc_pays]
     print(timer()+'[INFO] Successful importation')
+    

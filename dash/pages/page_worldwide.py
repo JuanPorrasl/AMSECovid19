@@ -44,7 +44,8 @@ body_worldwide = dbc.Container(
                                 dcc.Dropdown(
                                     id="selected_country",
                                     options=dropdown_options,
-                                    value='Worldwide'                            
+                                    value='Worldwide',
+                                    clearable=False
                                 ),
                             ],
                             md=3,
