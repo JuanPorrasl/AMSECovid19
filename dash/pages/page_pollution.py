@@ -189,6 +189,21 @@ def create_layout(app):
                 ],
                 no_gutters=True,
             ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='chart-weekofday-NO2', config=config)
+                            ),
+                        ],
+                        md=12,
+                    ),
+                ],
+                no_gutters=True,
+            ),
             
             dbc.Row(
                 [
@@ -256,7 +271,7 @@ def update_map_NO2(day_selected):
 
 
 
-@app.callback(Output('chart-scatter-NO2', 'figure'),
+@app.callback([Output('chart-scatter-NO2', 'figure'), Output('chart-weekofday-NO2', 'figure')],
               [Input('selected_country', 'value'),Input('selected_region', 'value')])
 def update_scatter_NO2(selected_country, selected_region):
     
@@ -283,7 +298,111 @@ def update_scatter_NO2(selected_country, selected_region):
         fig = px.line(df_scatter, y="NO2", x="date", template="plotly_white", title="NO2 Evolution of "+selected_country, render_mode="webgl")  
     else:
         fig = px.line(df_scatter[df_scatter.cc_region==selected_region], y="NO2", x="date", template="plotly_white", title="NO2 Evolution of "+selected_region+", "+selected_country, render_mode="webgl") 
-    return fig
+    
+    
+    #Bar plot week of day
+    if selected_region is not None:
+        df_scatter=df_scatter[df_scatter.cc_region==selected_region]
+    
+    
+    fig2 = go.Figure()
+    df_scatter["dayofweek"]=df_scatter.date.dt.day_name()
+    for elem in ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]:
+        df_scatter_day=df_scatter[df_scatter.dayofweek==elem]
+        fig2.add_trace(go.Bar(
+                        x=df_scatter_day.date,
+                        y=df_scatter_day.NO2,
+                        name=elem,
+                        marker_color='rgb(55, 83, 109)',
+                        visible=(True if elem == "Monday" else False),
+                        ))
+        fig2.add_trace(go.Scatter(
+                        x=df_scatter_day.date,
+                        y=df_scatter_day.NO2,
+                        name=elem,
+                        visible=(True if elem == "Monday" else False),
+                        line=dict(color="#fc5c65", dash="dash")))
+    
+    fig2.update_layout(
+        updatemenus=[
+            dict(
+                type="buttons",
+                direction="right",
+                active=0,
+                x=1,
+                y=1.1,
+                buttons=list([
+                    dict(label="Monday",
+                         method="update",
+                         args=[{"visible": [True, True, False, False, False, False, False, False, False, False, False, False, False, False]}]),
+                    dict(label="Tuesday",
+                         method="update",
+                         args=[{"visible": [False, False, True, True, False, False, False, False, False, False, False, False, False, False]}]),
+                    dict(label="Wednesday",
+                         method="update",
+                         args=[{"visible": [False, False, False, False, True, True, False, False, False, False, False, False, False, False]}]),
+                    dict(label="Thursday",
+                         method="update",
+                         args=[{"visible": [False, False, False, False, False, False, True, True, False, False, False, False, False, False]}]),
+                    dict(label="Friday",
+                         method="update",
+                         args=[{"visible": [False, False, False, False, False, False, False, False, True, True, False, False, False, False]}]),
+                    dict(label="Saturday",
+                         method="update",
+                         args=[{"visible": [False, False, False, False, False, False, False, False, False, False, True, True, False, False]}]),
+                    dict(label="Sunday",
+                         method="update",
+                         args=[{"visible": [False, False, False, False, False, False, False, False, False, False, False, False, True, True]}]),
+                ]),
+            )
+        ],
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=3,
+                         label="3m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            type="date",
+        )
+    )
+    
+    fig2.update_layout(
+        title=(('NO2 evolution by day of week in '+selected_country) if selected_region is None else ('NO2 evolution by day of week in '+selected_region+', '+selected_country)),
+        yaxis=dict(
+            title='NO2',
+        ),
+        legend=dict(
+            x=0,
+            y=1.0,
+            bgcolor='rgba(255, 255, 255, 0.5)',
+            bordercolor='rgba(255, 255, 255, 0)'
+        ),
+        template="plotly_white",
+        barmode='group',
+    )
+     
+    return fig, fig2
+
 
 
 @app.callback(Output('gauge-NO2', 'figure'),
