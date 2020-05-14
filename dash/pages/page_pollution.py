@@ -360,7 +360,7 @@ def update_scatter_NO2(selected_country, selected_region):
                         text=round((df_scatter_day.NO2.diff()/df_scatter_day.NO2.shift())*100,2).astype(str)+"%",
                         textposition="outside",
                         name=elem,
-                        marker_color='rgb(55, 83, 109)',
+                        marker_color='#4b6584',
                         visible=(True if elem == "Monday" else False),
                         ))
         fig2.add_trace(go.Scatter(
@@ -479,7 +479,7 @@ def update_scatterMonth_NO2(selected_country, selected_region):
         text=round((df_scatter.NO2.diff()/df_scatter.NO2.shift())*100,2).astype(str)+"%",
         textposition="outside",
         name="NO2",
-        marker_color='#4b6584',
+        marker_color='#8CABD1',
     ))
     fig.add_trace(go.Scatter(
         x=df_scatter.date.dt.to_period('M').dt.to_timestamp(),
