@@ -19,15 +19,12 @@ def timer():
 
 from cleaning_datas_pollution import df, safe_execute, fig_gauge, bar_color, config
 
-#Reverse color palets
-px.colors.diverging.Spectral.reverse()
-
 
 #Create badges last update
-df_group=df.groupby(["cc_pays",df.date.dt.year,df.date.dt.month,df.date.dt.day], as_index=False).agg({'counter':'sum','calcul':'sum','date':'max'})
+df_group=df.groupby(["cc_pays","date"], as_index=False).agg({'counter':'sum','calcul':'sum'})
 last_date=df_group.groupby("cc_pays").agg({"date":"max"}).to_dict()["date"]
 df_group=df_group[df_group.date==[last_date[elem] for elem in df_group.cc_pays]]
-badges_updates=[dbc.Badge(str(elem)+": "+last_date[elem].strftime("%d/%m/%y"), style={'background':("#26de81" if ((last_date[elem]==df_group.date.max()) | (last_date[elem]==(df_group.date.max()-pd.Timedelta("1 days")))) else "#fed330")}, className="mr-1") for elem in df_group.cc_pays]
+badges_updates=[dbc.Badge(str(elem)+": "+last_date[elem].strftime("%d/%m/%y"), style={'background':("#26de81" if ((last_date[elem]==df_group.date.max()) | (last_date[elem]==df_group.date.max())) else "#fed330")}, className="mr-1") for elem in df_group.cc_pays]
 
 
 
@@ -231,13 +228,9 @@ def toggle_collapse(n, is_open):
               [Input('pick-date-NO2', 'date')])
 def update_map_NO2(day_selected):
     #Evolution of pollution for some countries
-    df_group=df.groupby(["cc_pays",df.date.dt.year,df.date.dt.month,df.date.dt.day], as_index=False).agg({'counter':'sum','calcul':'sum','date':'max','cc_name':'max'})
+    df_group=df[df.date==day_selected].groupby(["cc_pays"], as_index=False).agg({'counter':'sum','calcul':'sum','cc_name':'max'})
     df_group["NO2"]=df_group.calcul/df_group.counter
-    
-    last_date=df_group[df_group.date <= day_selected].groupby("cc_pays").agg({"date":"max"}).to_dict()["date"]
-    df_group=df_group[df_group.date==[last_date[elem] for elem in df_group.cc_pays]]
-    
-    
+
     map_NO2 = go.Figure(data=go.Choropleth(
         locations=df_group['cc_name'],
         z=df_group['NO2'],
@@ -245,7 +238,10 @@ def update_map_NO2(day_selected):
         colorscale=px.colors.diverging.Spectral,
         autocolorscale=False,
         marker_line_color='#f2f2f2',
-        colorbar_title="NO2"
+        colorbar_title="NO2",
+        reversescale=True,
+        zmin=0,
+        zmax=0.0001,
     ))
     map_NO2.update_geos(projection_type="natural earth",
                     showocean=False,
@@ -254,7 +250,7 @@ def update_map_NO2(day_selected):
     )
     
     map_NO2.update_layout(height=800,
-                      title_text='Last NO2 concentration by countries',
+                      title_text='Last NO2 concentration by countries on '+day_selected,
                       margin={"r":0,"l":0,"b":0})
     return map_NO2
 
@@ -268,7 +264,8 @@ def update_scatter_NO2(selected_country, selected_region):
         list_group=["cc_pays","date"]
     else:
         list_group=["cc_pays","cc_region","date"]
-    df_scatter=df.groupby(list_group, as_index=False).agg({'counter':'sum','calcul':'sum','cc_name':'max'})
+        
+    df_scatter=df[df.cc_name==selected_country].groupby(list_group, as_index=False).agg({'counter':'sum','calcul':'sum','cc_name':'max'})
     list_group.pop()
     df_scatter["NO2"]=df_scatter.calcul/df_scatter.counter
     
@@ -283,9 +280,9 @@ def update_scatter_NO2(selected_country, selected_region):
     df_scatter=df_scatter[(df_scatter.counter >= df_scatter.q1)]
     
     if selected_region is None:
-        fig = px.line(df_scatter[df_scatter.cc_name==selected_country], y="NO2", x="date", template="plotly_white", title="NO2 Evolution of "+selected_country, render_mode="webgl")  
+        fig = px.line(df_scatter, y="NO2", x="date", template="plotly_white", title="NO2 Evolution of "+selected_country, render_mode="webgl")  
     else:
-        fig = px.line(df_scatter[(df_scatter.cc_name==selected_country) & (df_scatter.cc_region==selected_region)], y="NO2", x="date", template="plotly_white", title="NO2 Evolution of "+selected_region+", "+selected_country, render_mode="webgl") 
+        fig = px.line(df_scatter[df_scatter.cc_region==selected_region], y="NO2", x="date", template="plotly_white", title="NO2 Evolution of "+selected_region+", "+selected_country, render_mode="webgl") 
     return fig
 
 
