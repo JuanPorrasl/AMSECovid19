@@ -204,6 +204,21 @@ def create_layout(app):
                 ],
                 no_gutters=True,
             ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='chart-month-NO2', config=config)
+                            ),
+                        ],
+                        md=12,
+                    ),
+                ],
+                no_gutters=True,
+            ),
             
             dbc.Row(
                 [
@@ -265,7 +280,7 @@ def update_map_NO2(day_selected):
     )
     
     map_NO2.update_layout(height=800,
-                      title_text='Last NO2 concentration by countries on '+day_selected,
+                      title_text='Last NO2 concentration by countries on '+pd.to_datetime(day_selected, format="%Y-%m-%d").strftime("%d/%m/%Y"),
                       margin={"r":0,"l":0,"b":0})
     return map_NO2
 
@@ -299,6 +314,36 @@ def update_scatter_NO2(selected_country, selected_region):
     else:
         fig = px.line(df_scatter[df_scatter.cc_region==selected_region], y="NO2", x="date", template="plotly_white", title="NO2 Evolution of "+selected_region+", "+selected_country, render_mode="webgl") 
     
+    fig.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=3,
+                         label="3m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            type="date",
+        )
+    )
     
     #Bar plot week of day
     if selected_region is not None:
@@ -312,6 +357,8 @@ def update_scatter_NO2(selected_country, selected_region):
         fig2.add_trace(go.Bar(
                         x=df_scatter_day.date,
                         y=df_scatter_day.NO2,
+                        text=round((df_scatter_day.NO2.diff()/df_scatter_day.NO2.shift())*100,2).astype(str)+"%",
+                        textposition="outside",
                         name=elem,
                         marker_color='rgb(55, 83, 109)',
                         visible=(True if elem == "Monday" else False),
@@ -402,6 +449,91 @@ def update_scatter_NO2(selected_country, selected_region):
     )
      
     return fig, fig2
+
+
+
+
+#Month 
+@app.callback(Output('chart-month-NO2', 'figure'),
+              [Input('selected_country', 'value'),Input('selected_region', 'value')])
+def update_scatterMonth_NO2(selected_country, selected_region):
+    if selected_region is None:
+        list_group=["cc_pays",df.date.dt.year, df.date.dt.month]
+    else:
+        list_group=["cc_pays","cc_region",df.date.dt.year, df.date.dt.month]
+        
+    df_scatter=df[df.cc_name==selected_country].groupby(list_group, as_index=False).agg({'counter':'sum','calcul':'sum','date':'min'})
+    list_group.pop()
+    list_group.pop()
+    df_scatter["NO2"]=df_scatter.calcul/df_scatter.counter
+    
+    #Bar plot week of day
+    if selected_region is not None:
+        df_scatter=df_scatter[df_scatter.cc_region==selected_region]
+    
+    
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=df_scatter.date.dt.to_period('M').dt.to_timestamp(),
+        y=df_scatter.NO2,
+        text=round((df_scatter.NO2.diff()/df_scatter.NO2.shift())*100,2).astype(str)+"%",
+        textposition="outside",
+        name="NO2",
+        marker_color='#4b6584',
+    ))
+    fig.add_trace(go.Scatter(
+        x=df_scatter.date.dt.to_period('M').dt.to_timestamp(),
+        y=df_scatter.NO2,
+        name="NO2",
+        line=dict(color="#fc5c65", dash="dash")
+    ))
+    
+    fig.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=3,
+                         label="3m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            type="date",
+        )
+    )
+    
+    fig.update_layout(
+        title=(('NO2 evolution by month in '+selected_country) if selected_region is None else ('NO2 evolution by month in '+selected_region+', '+selected_country)),
+        yaxis=dict(
+            title='NO2',
+        ),
+        legend=dict(
+            x=0,
+            y=1.0,
+            bgcolor='rgba(255, 255, 255, 0.5)',
+            bordercolor='rgba(255, 255, 255, 0)'
+        ),
+        template="plotly_white",
+        barmode='group',
+        xaxis_tickformat = '%B %Y'
+    )
+     
+    return fig
+
+
 
 
 
