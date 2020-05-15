@@ -257,7 +257,7 @@ def main_bar(selected_country):
 @app.callback(Output('plot-map', 'figure'),
               [Input('map-slider', 'date')])
 def update_map(map_slider):
-    df_data=df[(df.Last_Update==map_slider) & (df.Country_Region!="Worldwide")].groupby(['Last_Update', 'Country_Region'], as_index=False).sum().loc[:,['Confirmed', 'Deaths']]
+    df_data=df[(df.Last_Update==map_slider) & (df.Country_Region!="Worldwide")].groupby(['Last_Update', 'Country_Region'], as_index=False)['Confirmed', 'Deaths'].sum()
     
     fig=go.Figure(data=go.Choropleth(
         locations=df_data['Country_Region'],
