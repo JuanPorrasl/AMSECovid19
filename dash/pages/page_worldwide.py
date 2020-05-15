@@ -254,7 +254,6 @@ def main_bar(selected_country):
 @app.callback(Output('plot-map', 'figure'),
               [Input('map-slider', 'date')])
 def update_map(map_slider):
-        #World Map
     df_data=df[(df.Last_Update==map_slider) & (df.Country_Region!="Worldwide")].groupby(['Last_Update', 'Country_Region'], as_index=False)['Confirmed', 'Deaths'].sum()
     
     fig=go.Figure(data=go.Choropleth(
@@ -271,6 +270,7 @@ def update_map(map_slider):
         zmin=7.5,
         zmax=11.8197782,
     ))
+
     fig.update_geos(
         projection_type="natural earth",
         showframe=False,
@@ -313,7 +313,6 @@ def update_daily_cases(selected_country):
         return fig
     graphs = {col: bar_graph(values, col) for col in dct.keys()}    
     return graphs['Confirmed'], graphs['Recovered'], graphs['Deaths']
-
 
 @app.callback(Output('infection-cases', 'figure'),
               [Input('selected_country', 'value')])

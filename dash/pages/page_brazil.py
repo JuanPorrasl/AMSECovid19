@@ -156,8 +156,6 @@ def create_layout(app):
 @app.callback(Output('brazil-map', 'figure'),
               [Input('days-slider', 'date')])
 def update_brazil_map(days_slider):
-
-    # Alternative with less DETAILS (consider deleting)
     fig = go.Figure(go.Choroplethmapbox(
         geojson=states_br, 
         locations=covid_state_br[(covid_state_br.date==days_slider)].codigo_ibg, 
@@ -180,7 +178,6 @@ def update_brazil_map(days_slider):
         mapbox_center = {"lat": -15.2495, "lon": -51.9253},
         margin={"r":0,"t":30,"l":0,"b":0}
     )
-
     return fig
 
 
