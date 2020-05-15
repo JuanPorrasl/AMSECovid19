@@ -5,7 +5,6 @@ import os
 
 import pandas as pd
 import numpy as np
-from astropy.convolution import convolve, Gaussian1DKernel
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html

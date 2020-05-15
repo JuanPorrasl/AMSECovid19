@@ -24,7 +24,7 @@ import datetime
 import time
 
 from app import app, auth
-from pages import page_france, page_brazil, page_US, page_COL, page_worldwide, page_analysis, page_legalnotice
+from pages import page_france, page_brazil, page_US, page_colombia, page_worldwide, page_analysis, page_legalnotice
 
 
 # Exposing server for gunicorn
@@ -123,7 +123,7 @@ def display_page(pathname):
     if pathname == "/brazil":
         return page_brazil.create_layout(app)
     if pathname == "/colombia":
-        return page_COL.create_layout(app)
+        return page_colombia.create_layout(app)
     if pathname == "/global":
         return page_analysis.create_layout(app)
     if pathname == "/legal":

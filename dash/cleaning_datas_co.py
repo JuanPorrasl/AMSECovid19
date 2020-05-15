@@ -8,7 +8,6 @@ Created on Mon May 11 13:59:30 2020
 import pandas as pd
 import numpy as np
 import json
-from urllib.request import urlopen
 
 config = {'displayModeBar': False}
 
@@ -115,11 +114,10 @@ COL_Dep_Covid = COL_Dep_Covid.sort_values(by='Total',ascending=False)
 
 today=COL_Covid['Detection_date']==pd.to_datetime(COL_Covid['Detection_date']).max().strftime("%m-%d-%Y")
 
-#Downloading json file
-
-url_co="https://gist.githubusercontent.com/john-guerra/43c7656821069d00dcbc/raw/3aadedf47badbdac823b00dbe259f6bc6d9e1899/colombia.geo.json"
-with urlopen(url_co) as response_co:
+#Load json file
+with open("data/processed/colombia.geo.json") as response_co:
     states_co = json.load(response_co)
+    
     
 for i in range(0,len(states_co["features"])):
                states_co["features"][i]["id"] = states_co["features"][i]["properties"]["NOMBRE_DPT"]

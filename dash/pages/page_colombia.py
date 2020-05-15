@@ -26,7 +26,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 #Python Script
-from cleaning_data_COL import COL_Covid, COL_City_Covid, COL_Dep_Covid, states_co
+from cleaning_datas_co import COL_Covid, COL_City_Covid, COL_Dep_Covid, states_co
 from cleaning_datas import df, today, yesterday, config
 
 #Cases by department
