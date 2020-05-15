@@ -57,11 +57,16 @@ today=pd.Timestamp.today()
 if url_cargo != 0:
     #check time of precedent file
     if((last_file.year < today.year) | (last_file.week < (today.week-1))):
-        cargo_update=pd.read_csv(url_cargo, encoding = "ISO-8859-1", sep=";")
-        new_file=pd.to_datetime(cargo_update["Date fin"][1], format="%d/%m/%Y").strftime(folder[:-1]+'S%W%d%m%y.csv')
-        #Save if not exist
-        if new_file not in os.listdir(path+folder):
-            cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
+        try:
+            cargo_update=pd.read_csv(url_cargo, encoding = "ISO-8859-1", sep=";")
+            new_file=pd.to_datetime(cargo_update["Date fin"][1], format="%d/%m/%Y").strftime(folder[:-1]+'S%W%d%m%y.csv')
+        except Exception as e:
+            print("CARGOS EXCEPT ERROR: ******************************")
+            print(e)
+        else:
+            #Save if not exist
+            if new_file not in os.listdir(path+folder):
+                cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
 
 ## Update vessels trafic
 folder="UpdateVessels/"
@@ -75,14 +80,19 @@ today=pd.Timestamp.today()
 
 if url_vessels != 0:
     if((last_file.year < today.year) | (last_file.week < today.week)):
-        cargo_update=pd.read_csv(url_vessels, encoding = "ISO-8859-1", sep=";")
-        new_file=pd.Timestamp.today().strftime(folder[:-1]+'S%W%d%m%y.csv')
-        #Save if not exist
-        if new_file not in os.listdir(path+folder):
-            #Remove previous file
-            os.remove(path+folder+files[ls.index(max(ls))])
-            #Save new file
-            cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
+        try:
+            cargo_update=pd.read_csv(url_vessels, encoding = "ISO-8859-1", sep=";")
+            new_file=pd.Timestamp.today().strftime(folder[:-1]+'S%W%d%m%y.csv')
+        except Exception as e:
+            print("VESSELS EXCEPT ERROR: ******************************")
+            print(e)
+        else:
+            #Save if not exist
+            if new_file not in os.listdir(path+folder):
+                #Remove previous file
+                os.remove(path+folder+files[ls.index(max(ls))])
+                #Save new file
+                cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
 
 #Correction if file doesn't exist to force the condition IF == TRUE
 if os.path.isfile(path+'../../processed/CARGO_2010-2020.xlsx'):

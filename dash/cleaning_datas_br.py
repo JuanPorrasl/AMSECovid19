@@ -16,10 +16,9 @@ covid_state_br = brazil_data.loc[brazil_data['place_type'] == "state"]
 #Get the a series of latest data for each state is_last == True
 last_date = covid_state_br['is_last']
 
-# Downloading the coordinates of Brazilian states
-url_br="https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson"
-with urlopen(url_br) as response_br:
-    states_br = json.load(response_br)
+# Loading the coordinates of Brazilian states 
+with open("data/processed/brazil-states.geojson") as url_br:
+    states_br = json.load(url_br)
     
 covid_state_br = covid_state_br.rename(columns={"city_ibge_code": "codigo_ibg"})
 

@@ -131,7 +131,7 @@ continent=pd.read_excel(folder+'/processed/country2continent.xlsx', index_col=0)
 df=df.merge(continent, left_on='Country_Region', how='left', right_on='Country_Region')
 
 
-#Add groupby date for sum Worldwide datas
+
 #Add groupby date for sum Worldwide datas
 temp=pd.DataFrame(df.groupby("Last_Update", as_index=False)[["Active","Confirmed","Deaths","Recovered"]].sum())
 temp["Country_Region"]="Worldwide"
@@ -141,8 +141,48 @@ temp=temp.reset_index(drop=True)
 df=pd.concat([temp, df])
 del(temp)
 
-today=df['Last_Update']==df['Last_Update'].max()
-yesterday=df['Last_Update']==(df['Last_Update']-pd.Timedelta("1 days")).max()
-
 
 last_file_hopkins=df['Last_Update'].max().strftime('%d/%m/%y')
+
+today=list(df['Last_Update']==df['Last_Update'].max())
+yesterday=list(df['Last_Update']==(df['Last_Update']-datetime.timedelta(days=1)).max())
+
+# Group US and sort by Active cases
+df_today=df.loc[today,:].groupby(["Country_Region"]).sum().loc[:,["Active","Confirmed","Deaths","Recovered"]].sort_values(by=['Active'],ascending= False).reset_index()
+
+# POPULATION DATA
+pop=pd.read_csv(folder+'/processed/Population.csv', index_col=False)
+
+#Drop some variables and keep only this year
+pop_today = pop[pop['Time']==pd.Timestamp.today().year].reset_index().drop(columns= ['index','LocID','Variant','VarID','MidPeriod'])
+#Convert to millions
+pop_today[['PopMale','PopFemale','PopTotal']] = pop_today[['PopMale','PopFemale','PopTotal']].multiply(1000, axis="index")
+
+UN_dict = {
+    'Bolivia (Plurinational State of)': 'Bolivia',
+    'Brunei Darussalam': 'Brunei',
+    'Myanmar': 'Burma',
+    'Congo':'Congo (Brazzaville)',
+    'Democratic Republic of the Congo':'Congo (Kinshasa)',
+    "Côte d'Ivoire":"Cote d'Ivoire",
+    'Iran (Islamic Republic of)':'Iran',
+    'Republic of Korea':'Korea, South',
+    "Lao People's Democratic Republic":'Laos',
+    'Republic of Moldova':'Moldova',
+    'Russian Federation':'Russia',
+    'Syrian Arab Republic':'Syria',
+    'United Republic of Tanzania':'Tanzania',
+    'United States of America':'US',
+    'Venezuela (Bolivarian Republic of)':'Venezuela',
+    'Viet Nam':'Vietnam',   
+}
+
+pop_today['Location'] = pop_today['Location'].replace(UN_dict)
+
+df_pop = df_today.merge(pop_today, left_on = 'Country_Region', right_on = 'Location').drop(columns= ['Location','Time']) 
+del(df_today)
+df_pop['Lethality'] = (df_pop['Deaths']/df_pop['Confirmed'])*100
+df_pop['Confirmed/Pop'] = (df_pop['Confirmed']/df_pop['PopTotal'])*100
+df_pop['Active/Pop'] = (df_pop['Active']/df_pop['PopTotal'])*100
+df_pop['Recovered/Pop'] = (df_pop['Recovered']/df_pop['PopTotal'])*100
+df_pop['Deaths/Pop'] = (df_pop['Deaths']/df_pop['PopTotal'])*100
