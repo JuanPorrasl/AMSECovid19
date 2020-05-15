@@ -9,8 +9,9 @@ from dash.dependencies import Input, Output, State
 
 from app import app
 import plotly.graph_objects as go
+import plotly.express as px
 
-from cleaning_datas import df, last_file_hopkins, config
+from cleaning_datas import df, last_file_hopkins, config, df_pop
 
 ## Ratios plots
 df_data=pd.DataFrame(df.groupby(["Country_Region","Last_Update"]).sum())
@@ -95,7 +96,41 @@ def create_layout(app):
                     ),
                 ],
                 no_gutters=True,
-            )
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                        dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='pop_density',figure=pd_fig, config=config)
+                            ),
+                        ],
+                        md=12,
+                    ),
+                ],
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.H5("Countries by population (Covid19 death and confirmed cases)")
+                        ],
+                        md=12,
+                    ),
+                    dbc.Col(
+                        [
+                        dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='pop_cases',figure=pop_fig, config=config)
+                            ),
+                        ],
+                        md=12,
+                    ),
+                ],
+            ),
         ],
         className="mt-4"
     )
@@ -129,4 +164,22 @@ def switch_tab(at):
                             opacity=0.8))
         fig.update_layout(height=400, title_text="Deaths/Confirmed ratio")
         return fig
-        
+   
+# Cases, deaths and total population
+pop_fig = px.treemap(df_pop, path=['Country_Region','Confirmed','Deaths'], values='PopTotal',
+                     color='Deaths',
+                     color_continuous_scale='Reds')
+pop_fig.update_layout(height=800, margin={"r":0,"t":0,"l":0,"b":0})
+
+#Population Density
+
+pd_fig = px.choropleth(df_pop, locations="Country_Region",
+                    color=np.power(df_pop["PopDensity"],0.1), # lifeExp is a column of gapminder
+                    hover_name="Country_Region", # column to add to hover information
+                    hover_data=['PopDensity','PopTotal',"Confirmed/Pop",'Confirmed','Deaths','Recovered'],
+                    color_continuous_scale=px.colors.sequential.Plasma,locationmode="country names")
+pd_fig.update_geos(fitbounds="locations", visible=False)
+pd_fig.update_layout(title_text="Population Density (Population per square kilometer)")
+pd_fig.update_coloraxes(colorbar_title="Pop Density (Log Scale)",colorscale="Magma_r")
+pd_fig.update_layout(coloraxis_showscale=False)
+

@@ -3,6 +3,10 @@ import numpy as np
 import os
 from datetime import datetime
 import plotly.graph_objects as go
+import time
+
+def timer():
+    return '['+datetime.now().strftime("%d/%m/%Y %H:%M:%S")+']'
 
 #Cases where the client does not have access to the links Cargo
 try:
@@ -10,7 +14,7 @@ try:
 except:
     url_cargo=0
     url_vessels=0
-    print("Cargos update links are not accessible. Did you set up the secrets.py file correctly? More information in the READ.ME")
+    print('\033[1;31;48m'+timer()+'[WARNING] Cargos update links are not accessible. Did you set up the secrets.py file correctly? More information in the READ.ME \033[0m')
 
 path="data/external/cargos/"
 config = {'displayModeBar': False}
@@ -25,14 +29,14 @@ def conversion(old):
     return (int(new[0])+int(new[1])/60.0+int(new[2])/3600.0) * direction[new_dir]
 
 ####### First part : Update data
-
+print(timer()+'[INFO] Check cargo files to update...')
 ls=[path+"UpdateCargo",path+"UpdateVessels",path+"archives",path+"archives/HistoriqueMarchandises",path+"archives/HistoriqueNavires"]
 for elem in ls:
     if(os.path.isdir(elem)==0):
         try:
             os.mkdir(elem)
         except OSError:
-            print ("Creation of the directory failed")
+            print('\033[1;31;48m'+timer()+'[ERROR] Creation of the directory failed \033[0m')
             
 #Create files to avoid bugs in HistoriqueNavires
 if len(os.listdir(path+"archives/HistoriqueNavires"))==0:
@@ -53,11 +57,15 @@ today=pd.Timestamp.today()
 if url_cargo != 0:
     #check time of precedent file
     if((last_file.year < today.year) | (last_file.week < (today.week-1))):
-        cargo_update=pd.read_csv(url_cargo, encoding = "ISO-8859-1", sep=";")
-        new_file=pd.to_datetime(cargo_update["Date fin"][1], format="%d/%m/%Y").strftime(folder[:-1]+'S%W%d%m%y.csv')
-        #Save if not exist
-        if new_file not in os.listdir(path+folder):
-            cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
+        try:
+            cargo_update=pd.read_csv(url_cargo, encoding = "ISO-8859-1", sep=";")
+            new_file=pd.to_datetime(cargo_update["Date fin"][1], format="%d/%m/%Y").strftime(folder[:-1]+'S%W%d%m%y.csv')
+        except Exception as e:
+            print('\033[1;31;48m'+timer()+'[WARNING] Cargos except error:',e,'. Maybe the file given have not the good columns structure? \033[0m')
+        else:
+            #Save if not exist
+            if new_file not in os.listdir(path+folder):
+                cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
 
 ## Update vessels trafic
 folder="UpdateVessels/"
@@ -71,14 +79,18 @@ today=pd.Timestamp.today()
 
 if url_vessels != 0:
     if((last_file.year < today.year) | (last_file.week < today.week)):
-        cargo_update=pd.read_csv(url_vessels, encoding = "ISO-8859-1", sep=";")
-        new_file=pd.Timestamp.today().strftime(folder[:-1]+'S%W%d%m%y.csv')
-        #Save if not exist
-        if new_file not in os.listdir(path+folder):
-            #Remove previous file
-            os.remove(path+folder+files[ls.index(max(ls))])
-            #Save new file
-            cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
+        try:
+            cargo_update=pd.read_csv(url_vessels, encoding = "ISO-8859-1", sep=";")
+            new_file=pd.Timestamp.today().strftime(folder[:-1]+'S%W%d%m%y.csv')
+        except Exception as e:
+            print('\033[1;31;48m'+timer()+'[WARNING] Vessels except error:',e,'. Maybe the file given have not the good columns structure? \033[0m')
+        else:
+            #Save if not exist
+            if new_file not in os.listdir(path+folder):
+                #Remove previous file
+                os.remove(path+folder+files[ls.index(max(ls))])
+                #Save new file
+                cargo_update.to_csv(path+folder+new_file, sep=";", encoding = "ISO-8859-1")
 
 #Correction if file doesn't exist to force the condition IF == TRUE
 if os.path.isfile(path+'../../processed/CARGO_2010-2020.xlsx'):
@@ -123,6 +135,7 @@ if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os
     cargo=cargo.reset_index(drop=True)
     #Save
     cargo.to_excel(path+'../../processed/CARGO_2010-2020.xlsx', encoding = "ISO-8859-1")
+    print(timer()+'[INFO] Cargo files updated.')
     
 #Correction if file doesn't exist to force the condition IF == TRUE
 if os.path.isfile(path+'../../processed/VESSEL_2010-2020.xlsx'):
@@ -183,8 +196,10 @@ if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os
     df.to_excel(path+"../../processed/VESSEL_2010-2020.xlsx")
     #Get free RAM
     del(df, vessels_update, vessels_update_add, df_add)
+    print(timer()+'[INFO] Vessels files updated.')
 
 
+print(timer()+'[INFO] Loading cargos files')
 ####### Second part : Cleaning datas
 #Read cargo file
 cargo=pd.read_excel(path+"../../processed/CARGO_2010-2020.xlsx", encoding = "ISO-8859-1", index_col=0)
@@ -208,7 +223,6 @@ cargo.date=cargo.date.dt.to_period('M').dt.to_timestamp()
 
 
 #Badges last updates
-
 
 
 

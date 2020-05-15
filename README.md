@@ -18,13 +18,14 @@ Project Organization
     │   │   └── secrets.py           <- Secret script where ID and password are saved. Please, 
     │   │                               create your file with following elements: 
     │   │                               DASHBOARD_ACCESS = {'USERNAME': 'PASSWORD'}
-    │   ├── cleaning_data.py         <- Cleaning datas for the index page
-    │   ├── cleaning_data_br.py      <- Cleaning datas for the brazil page
-    │   ├── cleaning_datas_docks.py  <- Cleaning and update datas for the docks page
-    │   ├── cleaning_data_fr.py      <- Cleaning datas for the france page
+    │   ├── cleaning_data.py            <- Cleaning datas for the index page
+    │   ├── cleaning_data_br.py         <- Cleaning datas for the brazil page
+    │   ├── cleaning_datas_docks.py     <- Cleaning and update datas for the docks page
+    │   ├── cleaning_data_fr.py         <- Cleaning datas for the france page
+    │   ├── cleaning_datas_pollution.py <- Cleaning datas for the air pollution page
     │   │
     │   ├── data                  
-    │   │   ├── external             <- Data from third party sources.
+    │   │   ├── external             
     │   │   │   ├── cargo            <- Data provided by Marseille Gyptis International
     │   │   │   │   ├── archives     <- THIS FOLDER IS NOT AVAILABLE ON GITHUB.
     │   │   │   │   │   ├── HistoriqueMarchandises <- Historical goods data from 2010
@@ -32,9 +33,19 @@ Project Organization
     │   │   │   │   ├── UpdateCargo   <- New weekly traffic data
     │   │   │   │   └── UpdateVessels <- New weekly goods data
     │   │   │   │
+    │   │   │   ├── datas_sentinel5         <- Folder containing satellite data on air pollution (NO2) after     │   │   │   │   │                          treatment by an algorithm not included in this github.
+    │   │   │   │   ├── archives            <- Folder containing the files that can be used after
+    │   │   │   │   │                          processing.
+    │   │   │   │   ├── cleaned             <- Empty folder used when we clean and merge satelite datas
+    │   │   │   │   ├── csv                 <- Folder containing CSV of API results to avoid spamming their
+    │   │   │   │   │                          API
+    │   │   │   │   └── tracking_files.csv  <- Contains days merged with the number of files used. This
+    │   │   │   │                              allow us to have a track of new files updated
+    │   │   │   │
     │   │   │   └── hopkins           <- Hopkins CSV datas
     │   │   ├── processed             <- The final, canonical data sets for modeling.
     │   │   │   ├── CARGO_2010-2020.xlsx    <- Cleaned cargos archives NOT AVAILABLE ON GITHUB
+    │   │   │   ├── country_code.py         <- Country code ISO-2 Dictionary
     │   │   │   ├── country2continent.xlsx  <- Country Dictionary
     │   │   │   ├── seaport_code.csv        <- Port Dictionary
     │   │   │   └── VESSEL_2010-2020.xlsx   <- Cleaned vessels archives NOT AVAILABLE ON GITHUB
@@ -48,6 +59,7 @@ Project Organization
     │   │   ├── page_docks.py           <- Content of the page "docks" 
     │   │   ├── page_france.py          <- Content of the page "france"
     │   │   ├── page_legalnotice.py     <- Content of the page "legal"
+    │   │   ├── page_pollution.py       <- Content of the page "air_pollution"
     │   │   └── page_worldwide.py       <- Content of the main page
     │   │
     │   └── index.py               <- Inital script to run for displaying Dashboad.
