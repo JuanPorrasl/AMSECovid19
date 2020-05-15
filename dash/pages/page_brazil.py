@@ -118,11 +118,11 @@ def update_brazil_map(days_slider):
 
     # Alternative with less DETAILS (consider deleting)
     fig = go.Figure(go.Choroplethmapbox(geojson=states_br, locations=covid_state_br[(covid_state_br.date==covid_state_br.date.unique()[days_slider])].codigo_ibg, z=covid_state_br[(covid_state_br.date==covid_state_br.date.unique()[days_slider])].confirmed,
-                                    colorscale="OrRd", zmin=0,
+                                    colorscale="matter", zmin=0,
                                     text = covid_state_br[(covid_state_br.date==covid_state_br.date.unique()[days_slider])]['text'],
                                     #hovertemplate = '<b>State</b>: <b>%{text}</b>'+ '<br><b>Confirmed Cases </b>: %{z}<br>',
                                     colorbar_title = "Confirmed Cases",
-                                    marker_opacity=0.7, marker_line_width=0))
+                                    marker_opacity=0.3, marker_line_width=0.5))
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=2.90, mapbox_center = {"lat": -15.2495, "lon": -51.9253})
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})

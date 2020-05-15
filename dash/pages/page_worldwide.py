@@ -202,12 +202,12 @@ def main_bar(selected_country):
               [Input('map-slider', 'value')])
 def update_map(map_slider):
         #World Map
-    df_data=df[(df.Last_Update==df.Last_Update.unique()[map_slider])].groupby(['Last_Update', 'Country_Region'], as_index=False)['Confirmed', 'Deaths'].sum()
+    df_data=df[(df.Last_Update==df.Last_Update.unique()[map_slider])].groupby(['Last_Update', 'Country_Region'], as_index=False)['Confirmed','Recovered', 'Deaths'].sum()
         
     fig = px.scatter_geo(df_data, locations="Country_Region", locationmode = "country names",
-                         color=np.power(df_data["Confirmed"],0.3)-2, size= np.power(df_data["Confirmed"]+1,0.3)-1,
+                         color=np.power(df_data["Deaths"]+1,0.01)-2, size= np.power(df_data["Confirmed"]+50,0.2)-1,
                          hover_name="Country_Region",
-                         hover_data=["Confirmed"],
+                         hover_data=["Confirmed","Deaths","Recovered"],
                          animation_frame="Last_Update",
                          projection="natural earth")
     fig.update_coloraxes(colorscale="redor")
@@ -245,7 +245,6 @@ def update_daily_cases(selected_country):
         return fig
     graphs = {col: bar_graph(values, col) for col in dct.keys()}    
     return graphs['Confirmed'], graphs['Recovered'], graphs['Deaths']
-
 
 @app.callback(Output('infection-cases', 'figure'),
               [Input('selected_country', 'value')])

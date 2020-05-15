@@ -139,3 +139,47 @@ del(temp)
 
 today=df['Last_Update']==df['Last_Update'].max()
 yesterday=df['Last_Update']==(df['Last_Update']-datetime.timedelta(days=1)).max()
+
+# Aditional to population analysis
+
+df_today=df[today].groupby(["Country_Region"])["Active","Confirmed","Deaths","Recovered"].sum().sort_values(by=['Active'],ascending= False).reset_index()
+
+# POPULATION DATA
+
+pop=pd.read_csv(folder+'/processed/Population.csv')
+
+# Uited Nations data population
+cond = pop['Time']==2019
+#Drop some variables
+pop_today = pop[cond].reset_index().drop(columns= ['index','LocID','Variant','VarID','MidPeriod'])
+#Convert to millions
+pop_today[['PopMale','PopFemale','PopTotal']] = pop_today[['PopMale','PopFemale','PopTotal']].multiply(1000, axis="index")
+pop_today.head(15)
+
+UN_dict = {
+    'Bolivia (Plurinational State of)': 'Bolivia',
+    'Brunei Darussalam': 'Brunei',
+    'Myanmar': 'Burma',
+    'Congo':'Congo (Brazzaville)',
+    'Democratic Republic of the Congo':'Congo (Kinshasa)',
+    "Côte d'Ivoire":"Cote d'Ivoire",
+    'Iran (Islamic Republic of)':'Iran',
+    'Republic of Korea':'Korea, South',
+    "Lao People's Democratic Republic":'Laos',
+    'Republic of Moldova':'Moldova',
+    'Russian Federation':'Russia',
+    'Syrian Arab Republic':'Syria',
+    'United Republic of Tanzania':'Tanzania',
+    'United States of America':'US',
+    'Venezuela (Bolivarian Republic of)':'Venezuela',
+    'Viet Nam':'Vietnam',   
+}
+
+pop_today['Location'] = pop_today['Location'].replace(UN_dict)
+
+df_pop = df_today.merge(pop_today, left_on = 'Country_Region', right_on = 'Location').drop(columns= ['Location','Time']) 
+df_pop['Lethality'] = (df_pop['Deaths']/df_pop['Confirmed'])*100
+df_pop['Confirmed/Pop'] = (df_pop['Confirmed']/df_pop['PopTotal'])*100
+df_pop['Active/Pop'] = (df_pop['Active']/df_pop['PopTotal'])*100
+df_pop['Recovered/Pop'] = (df_pop['Recovered']/df_pop['PopTotal'])*100
+df_pop['Deaths/Pop'] = (df_pop['Deaths']/df_pop['PopTotal'])*100
