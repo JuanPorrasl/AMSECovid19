@@ -14,7 +14,7 @@ try:
 except:
     url_cargo=0
     url_vessels=0
-    print("Cargos update links are not accessible. Did you set up the secrets.py file correctly? More information in the READ.ME")
+    print('\033[1;31;48m'+timer()+'[WARNING] Cargos update links are not accessible. Did you set up the secrets.py file correctly? More information in the READ.ME \033[0m')
 
 path="data/external/cargos/"
 config = {'displayModeBar': False}
@@ -36,7 +36,7 @@ for elem in ls:
         try:
             os.mkdir(elem)
         except OSError:
-            print ("Creation of the directory failed")
+            print('\033[1;31;48m'+timer()+'[ERROR] Creation of the directory failed \033[0m')
             
 #Create files to avoid bugs in HistoriqueNavires
 if len(os.listdir(path+"archives/HistoriqueNavires"))==0:
@@ -61,8 +61,7 @@ if url_cargo != 0:
             cargo_update=pd.read_csv(url_cargo, encoding = "ISO-8859-1", sep=";")
             new_file=pd.to_datetime(cargo_update["Date fin"][1], format="%d/%m/%Y").strftime(folder[:-1]+'S%W%d%m%y.csv')
         except Exception as e:
-            print("CARGOS EXCEPT ERROR: ******************************")
-            print(e)
+            print('\033[1;31;48m'+timer()+'[WARNING] Cargos except error:',e,'. Maybe the file given have not the good columns structure? \033[0m')
         else:
             #Save if not exist
             if new_file not in os.listdir(path+folder):
@@ -84,8 +83,7 @@ if url_vessels != 0:
             cargo_update=pd.read_csv(url_vessels, encoding = "ISO-8859-1", sep=";")
             new_file=pd.Timestamp.today().strftime(folder[:-1]+'S%W%d%m%y.csv')
         except Exception as e:
-            print("VESSELS EXCEPT ERROR: ******************************")
-            print(e)
+            print('\033[1;31;48m'+timer()+'[WARNING] Vessels except error:',e,'. Maybe the file given have not the good columns structure? \033[0m')
         else:
             #Save if not exist
             if new_file not in os.listdir(path+folder):

@@ -114,6 +114,7 @@ body_worldwide = dbc.Container(
                             options=dropdown_options,
                             value='Worldwide',
                             className="mb-2 mt-4",
+                            clearable=False,
                         ),
                     ],
                     xl=4,
@@ -256,7 +257,7 @@ def main_bar(selected_country):
 @app.callback(Output('plot-map', 'figure'),
               [Input('map-slider', 'date')])
 def update_map(map_slider):
-    df_data=df[(df.Last_Update==map_slider) & (df.Country_Region!="Worldwide")].groupby(['Last_Update', 'Country_Region'], as_index=False)['Confirmed', 'Deaths'].sum()
+    df_data=df[(df.Last_Update==map_slider) & (df.Country_Region!="Worldwide")].groupby(['Last_Update', 'Country_Region'], as_index=False).sum().loc[:,['Confirmed', 'Deaths']]
     
     fig=go.Figure(data=go.Choropleth(
         locations=df_data['Country_Region'],

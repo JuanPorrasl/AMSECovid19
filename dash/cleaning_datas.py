@@ -145,7 +145,7 @@ del(temp)
 last_file_hopkins=df['Last_Update'].max().strftime('%d/%m/%y')
 
 today=list(df['Last_Update']==df['Last_Update'].max())
-yesterday=list(df['Last_Update']==(df['Last_Update']-datetime.timedelta(days=1)).max())
+yesterday=list(df['Last_Update']==(df['Last_Update']-pd.Timedelta(days=1)).max())
 
 # Group US and sort by Active cases
 df_today=df.loc[today,:].groupby(["Country_Region"]).sum().loc[:,["Active","Confirmed","Deaths","Recovered"]].sort_values(by=['Active'],ascending= False).reset_index()
