@@ -11,7 +11,7 @@ from app import app
 import plotly.graph_objects as go
 import plotly.express as px
 
-from cleaning_datas import df, config, df_pop
+from cleaning_datas import df, last_file_hopkins, config, df_pop
 
 ## Ratios plots
 df_data=pd.DataFrame(df.groupby(["Country_Region","Last_Update"]).sum())
@@ -39,7 +39,8 @@ def create_layout(app):
                 [
                     dbc.Col(
                         [
-                            html.H2("Global analysis")
+                            html.H2("Global analysis"),
+                            html.P(["Latest Updates: ",dbc.Badge("Hopkins: "+str(last_file_hopkins), color="secondary", className="mr-1")])
                         ],
                         md=12,
                         

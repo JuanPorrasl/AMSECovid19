@@ -16,6 +16,31 @@ import plotly.express as px
 
 from cleaning_datas_br import states_br, covid_state_br, last_date, config
 
+menu_ranges=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="MTD",
+                         step="month",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=3,
+                         label="3m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            type="date"
+        )
+
 #Fixing id
 for i in range(0,len(states_br["features"])):
                states_br["features"][i]["id"] = states_br["features"][i]["properties"]["codigo_ibg"]
@@ -30,7 +55,13 @@ covid_state_br['text'] = 'State: ' + covid_state_br['state'].astype(str) + '<br>
     'Lethality Rate: ' + covid_state_br['lethality'].astype(str) + '%' + '<br>' + \
     'Population (2019): ' + covid_state_br['estimated_population_2019'].astype(str)
 
-
+#Create badges last update
+badges_updates=covid_state_br.groupby(["state"], as_index=False).agg({"date":"max"})
+badges_updates.date=badges_updates.date.dt.strftime('%d/%m/%y')
+badges_updates=badges_updates.set_index("state")
+badges_updates=badges_updates.to_dict()["date"]
+badges_updates=[dbc.Badge(str(elem)+": "+str(badges_updates[elem]), color="secondary", className="mr-1") for elem in badges_updates]
+badges_updates.insert(0,"Latest Updates: ")
 
 def create_layout(app):
     body = dbc.Container(
@@ -40,23 +71,24 @@ def create_layout(app):
                 [
                     dbc.Col(
                         [
-                            html.H2("Detailed Brazil analysis")
+                            html.H2("Detailed Brazil analysis"),
+    
                         ],
-                        xl=4,
+                        xl=10,
                         
                     ),
                     dbc.Col(
                         [
-                            dcc.Slider(
+                            dcc.DatePickerSingle(
                                 id='days-slider',
-                                min=0,
-                                max=len(covid_state_br.date.unique())-1,
-                                value=len(covid_state_br.date.unique())-1,
-                                marks={days: str(pd.to_datetime(covid_state_br.date.unique()[days]).strftime("%m/%d")) for days in range(0,len(covid_state_br.date.unique()), 3)},
-                                step=None
+                                min_date_allowed=covid_state_br.date.min(),
+                                max_date_allowed=covid_state_br.date.max(),
+                                initial_visible_month=covid_state_br.date.max(),
+                                date=covid_state_br.date.max(),
+                                display_format='D/M/Y',
                             ),
                         ],
-                        xl=8,
+                        md=2,
                     ),
                 ],
                 justify="center",
@@ -65,8 +97,17 @@ def create_layout(app):
                 [
                     dbc.Col(
                         [
-                            html.H5("Number of hospitalizations in Brazil"),
-                            
+                            html.P(badges_updates)
+                        ],
+                        xl=12,
+                    ),
+                ],
+                justify="center",
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
                             dcc.Loading(
                                 id="loading-1",
                                 type="default",
@@ -113,20 +154,30 @@ def create_layout(app):
 
 
 @app.callback(Output('brazil-map', 'figure'),
-              [Input('days-slider', 'value')])
+              [Input('days-slider', 'date')])
 def update_brazil_map(days_slider):
-
-    # Alternative with less DETAILS (consider deleting)
-    fig = go.Figure(go.Choroplethmapbox(geojson=states_br, locations=covid_state_br[(covid_state_br.date==covid_state_br.date.unique()[days_slider])].codigo_ibg, z=covid_state_br[(covid_state_br.date==covid_state_br.date.unique()[days_slider])].confirmed,
-                                    colorscale="matter", zmin=0,
-                                    text = covid_state_br[(covid_state_br.date==covid_state_br.date.unique()[days_slider])]['text'],
-                                    #hovertemplate = '<b>State</b>: <b>%{text}</b>'+ '<br><b>Confirmed Cases </b>: %{z}<br>',
-                                    colorbar_title = "Confirmed Cases",
-                                    marker_opacity=0.3, marker_line_width=0.5))
-    fig.update_layout(mapbox_style="carto-positron",
-                      mapbox_zoom=2.90, mapbox_center = {"lat": -15.2495, "lon": -51.9253})
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-
+    fig = go.Figure(go.Choroplethmapbox(
+        geojson=states_br, 
+        locations=covid_state_br[(covid_state_br.date==days_slider)].codigo_ibg, 
+        z=covid_state_br[(covid_state_br.date==days_slider)].confirmed,
+        colorscale="OrRd", 
+        zmin=0,
+        zmax=20000,
+        name="",
+        text = covid_state_br[(covid_state_br.date==days_slider)]['text'],
+        hovertemplate = '<b>State</b>: <b>%{text}</b>'+ '<br><b>Confirmed Cases </b>: %{z}<br>',
+        colorbar_title = "Confirmed Cases",
+        marker_opacity=0.7, 
+        marker_line_width=0
+    ))
+    
+    fig.update_layout(
+        mapbox_style="carto-positron",
+        mapbox_zoom=2.90, 
+        title="Cumulated number of hospitalizations in Brazil on "+pd.to_datetime(days_slider, format="%Y-%m-%d").strftime("%d/%m/%Y"),
+        mapbox_center = {"lat": -15.2495, "lon": -51.9253},
+        margin={"r":0,"t":30,"l":0,"b":0}
+    )
     return fig
 
 
@@ -135,69 +186,50 @@ def switch_tab_br(at):
     if at == "tab_2_br":
         # Confirmed cases per 100k habitants
         fig = px.line(covid_state_br, y="confirmed_per_100k_inhabitants", x="date", color="state", render_mode="webgl")
-        fig.update_layout(title_text="Confirmed cases per 100k/hbts",
-                           xaxis_title="Timeline",
-                           yaxis_title="Confirmed cases per 100k/hbts")
-        
         fig.update_layout(
-            updatemenus=[
-                dict(
-                    type = "buttons",
-                    direction = "left",
-                    buttons=list([
-                        dict(
-                            args=["yaxis.type", "linear"],
-                            label="Linear",
-                            method="relayout"
-                        ),
-                        dict(
-                            args=["yaxis.type", "log"],
-                            label="Log",
-                            method="relayout"
-                        )
-                    ]),
-                    pad={"r": 0, "t": 0},
-                    showactive=True,
-                    x=1.2,
-                    xanchor="right",
-                    y=1,
-                    yanchor="bottom"
-                ),
-            ]
+            title_text="Confirmed cases per 100k/hbts",
+            xaxis_title="Timeline",
+            yaxis_title="Confirmed cases per 100k/hbts"
         )
-        return fig
+        
     else:
         # Confirmed cases
         fig = px.line(covid_state_br, y="confirmed", x="date", color="state", render_mode="webgl")
-        fig.update_layout(title="Confirmed Cases by Brazilian State",
-                           xaxis_title="Timeline",
-                           yaxis_title="Confirmed Cases")
-        
         fig.update_layout(
-            updatemenus=[
-                dict(
-                    type = "buttons",
-                    direction = "left",
-                    buttons=list([
-                        dict(
-                            args=["yaxis.type", "linear"],
-                            label="Linear",
-                            method="relayout"
-                        ),
-                        dict(
-                            args=["yaxis.type", "log"],
-                            label="Log",
-                            method="relayout"
-                        )
-                    ]),
-                    pad={"r": 0, "t": 0},
-                    showactive=True,
-                    x=1.2,
-                    xanchor="right",
-                    y=1,
-                    yanchor="bottom"
-                ),
-            ]
+            title="Confirmed Cases by Brazilian State",
+            xaxis_title="Timeline",
+            yaxis_title="Confirmed Cases"
         )
         
-        return fig
+    fig.update_layout(
+        template="plotly_white", 
+        height=600,
+        xaxis=menu_ranges,
+        margin={"t":80},
+        updatemenus=[
+            dict(
+                type = "buttons",
+                direction = "left",
+                buttons=list([
+                    dict(
+                        args=["yaxis.type", "linear"],
+                        label="Linear",
+                        method="relayout"
+                    ),
+                    dict(
+                        args=["yaxis.type", "log"],
+                        label="Log",
+                        method="relayout"
+                    )
+                ]),
+                pad={"r": 0, "t": 0},
+                showactive=True,
+                x=1,
+                xanchor="right",
+                y=1,
+                yanchor="bottom"
+            ),
+        ]
+    )
+        
+    return fig

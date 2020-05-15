@@ -82,6 +82,97 @@ txt_notice=[
             ]), 
 ]
 
+cards_pictures = dbc.CardGroup(
+    [
+        dbc.Card([
+            dbc.CardImg(src="../assets/eduardo.jpg", top=True),
+            dbc.CardBody(
+                html.A("LEITE KROPIWIEC FILHO Eduardo", href="https://www.linkedin.com/in/eduardo-leite-kropiwiec-filho-a38473ba/", target="_blank")
+            ),
+        ]),
+        dbc.Card([
+            dbc.CardImg(src="../assets/thomas.jpg", top=True),
+            dbc.CardBody(
+                html.A("PICAL Thomas", href="https://www.linkedin.com/in/thomas-pical-b83b73113/", target="_blank")
+            ),
+        ]),
+        dbc.Card([
+            dbc.CardImg(src="../assets/juan.jpg", top=True),
+            dbc.CardBody(
+                html.A("PORRAS Juan", href="https://www.linkedin.com/in/juanporrasl/", target="_blank")
+            ),
+        ]),
+        dbc.Card([
+            dbc.CardImg(src="../assets/gabriela.jpg", top=True),
+            dbc.CardBody(
+                html.A("PRADA Ana gabriela", href="https://www.linkedin.com/in/ana-gabriela-prada-aranguren-885186198/", target="_blank")
+            ),
+        ]),
+        dbc.Card([
+            dbc.CardImg(src="../assets/alvaro.jpg", top=True),
+            dbc.CardBody(
+                html.A("SANCHEZ Alvaro", href="https://www.linkedin.com/in/alvaro-sanchez-644611153/", target="_blank")
+            ),
+        ]),
+    ]
+)
+
+txt_origin=[
+    html.P([
+        "AMSE Student Covid19 Dashboard is a university project launched in april 2020 by a team of 5 students from Aix-Marseille School of Economics, France, with a background in big data econometrics. More information about our training is available ",
+        html.A("here.",href="https://www.amse-aixmarseille.fr/fr", target="_blank"),
+    ]),
+    cards_pictures,
+    html.Br(),
+    html.P([
+        "This non-profit and educational project has several objectives: firstly, we wish to provide quick and easy access to daily data on the evolution of covid-19, in order to enable public decision-makers to take appropriate action against covid19. When certain countries allow it, we propose a regional study of the evolution of the coronavirus. In a second step, we wish to provide an in-depth analysis of the evolution of the economic situation throughout the world to observe quantifiable signs of economic recovery. This can be done, for example, by observing the port of Marseille on a local scale, or air pollution on a global scale.",
+    ]),
+    html.P([
+        'The project participates in the Banque de France competition "Construction of high-frequency indicators on international trade and real estate" available ',
+        html.A("here.",href="https://app.b2ideas.eu/Project/DetailsProject/53", target="_blank"),
+    ]),
+    html.P([
+        "The entire dashboard is under MIT license. The dashboard source code and data are available on GitHub ",
+        html.A("here.",href="https://github.com/JuanPorrasl/AMSECovid19/", target="_blank"),
+    ])
+]
+
+txt_sources=[
+    html.Ul([
+        html.Li([
+            html.P("Covid19"),
+            html.Ul([
+                html.Li([
+                    html.A("Hopkins University", href="https://coronavirus.jhu.edu/map.html", target="_blank")
+                ]),
+                html.Li([
+                    html.A("Brasil.io", href="https://brasil.io/home/", target="_blank")
+                ]),
+                html.Li([
+                    html.A("French government", href="https://www.data.gouv.fr/fr/datasets/donnees-des-urgences-hospitalieres-et-de-sos-medecins-relatives-a-lepidemie-de-covid-19/", target="_blank")
+                ]),
+            ]),
+            html.Br(),
+        ]),
+        html.Li([
+            html.P("Air pollution"),
+            html.Ul([
+                html.Li([
+                    html.A("European Spatial Agency", href="https://sentinel.esa.int/web/sentinel/missions/sentinel-5", target="_blank")
+                ]),
+            ]),
+            html.Br(),
+        ]),
+        html.Li([
+            html.P("Marseille Docks"),
+            html.Ul([
+                html.Li([
+                    html.A("Marseille Gyptis International", href="https://www.mgi-ci5.com/", target="_blank")
+                ]),
+            ]),
+        ]),
+    ]),
+]
 
 def create_layout(app):
     body = dbc.Container(
@@ -92,12 +183,10 @@ def create_layout(app):
                     dbc.Col(
                         [
                             html.H2("Terms of use"),
-                            html.H4("Who are we?"),
-                            html.Div(lorem),
                             html.H4("The origin of the project"),
-                            html.Div(lorem),
+                            html.Div(txt_origin),
                             html.H4("Data sources"),
-                            html.Div(lorem),
+                            html.Div(txt_sources),
                             html.H4("Explanations of the graphs"),
                             html.Div(lorem),
                             html.H4("Acknowledgements"),

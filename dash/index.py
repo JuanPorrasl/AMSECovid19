@@ -24,7 +24,9 @@ import datetime
 import time
 
 from app import app, auth
-from pages import page_france, page_brazil, page_US, page_colombia, page_worldwide, page_analysis, page_legalnotice
+
+from pages import page_france, page_brazil, page_docks, page_US, page_colombia, page_worldwide, page_analysis, page_legalnotice
+
 
 
 # Exposing server for gunicorn
@@ -43,11 +45,6 @@ with open(CONFIGURATION_FILE, 'r') as file:
 os.chdir(config['directory']['application'])
 
 
-#Settings
-# TODO: to remove, no usage in dash app, only in notebooks
-pd.set_option('display.max_columns', 20)
-
-
 #Navbar
 navbar = dbc.NavbarSimple(
     children=[
@@ -64,6 +61,15 @@ navbar = dbc.NavbarSimple(
             nav=True,
             in_navbar=True,
             label="Countries",
+        ),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("Economic Indicators", header=True),
+                dbc.DropdownMenuItem("port of Marseille/Fos", href="/docks"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="Indicators",
         ),
     ],
     brand="AMSE Student Covid19 Dashboard",
@@ -128,6 +134,8 @@ def display_page(pathname):
         return page_analysis.create_layout(app)
     if pathname == "/legal":
         return page_legalnotice.create_layout(app)
+    if pathname == "/docks":
+        return page_docks.create_layout(app)
     else:
         return page_worldwide.body_worldwide
   

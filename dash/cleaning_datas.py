@@ -137,6 +137,8 @@ temp=temp.reset_index(drop=True)
 df=pd.concat([temp, df])
 del(temp)
 
+last_file_hopkins=df['Last_Update'].max().strftime('%d/%m/%y')
+
 today=list(df['Last_Update']==df['Last_Update'].max())
 yesterday=list(df['Last_Update']==(df['Last_Update']-datetime.timedelta(days=1)).max())
 
