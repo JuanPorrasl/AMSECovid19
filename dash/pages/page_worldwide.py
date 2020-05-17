@@ -71,6 +71,7 @@ body_worldwide = dbc.Container(
                         ),
                         dbc.Col(
                             [
+
                                 dcc.DatePickerSingle(
                                     id='map-slider',
                                     min_date_allowed=df.Last_Update.min(),
@@ -78,6 +79,7 @@ body_worldwide = dbc.Container(
                                     initial_visible_month=df.Last_Update.max(),
                                     date=df.Last_Update.max(),
                                     display_format='D/M/Y',
+
                                 ),
                             ],
                         md=2,
@@ -112,6 +114,7 @@ body_worldwide = dbc.Container(
                             options=dropdown_options,
                             value='Worldwide',
                             className="mb-2 mt-4",
+                            clearable=False,
                         ),
                     ],
                     xl=4,
