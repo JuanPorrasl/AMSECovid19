@@ -18,6 +18,7 @@ import plotly.express as px
 
 from cleaning_datas_docks import cargo, last_file_cargo, vessels, last_file_vessels, seacode, config
 
+
 #Plot
 years = vessels.groupby("date")[["counter"]].sum().fillna(0)[1:].index
 
@@ -47,7 +48,25 @@ vessels_number.add_trace(go.Bar(x=years,
                 marker_color='rgb(26, 118, 255)'
                 ))
 
+
 vessels_number.update_layout(
+    # highlight from today to last forecast
+    shapes=[
+        dict(
+            type="rect",
+            xref="x",
+            yref="paper",
+            x0=pd.Timestamp.today().strftime("%Y-%m-16"),
+            y0=0,
+            x1=years.max()+pd.Timedelta("30 days"),
+            y1=1,
+            fillcolor="#fd9644",
+            opacity=0.5,
+            layer="below",
+            line_width=0,
+        ),
+    ],
+    #Graphs settings
     margin={"b":0},
     height=500,
     template="plotly_white",
@@ -55,10 +74,16 @@ vessels_number.update_layout(
     yaxis=dict(
         title='Number of vessels',
     ),
-
     barmode='group',
+    legend=dict(
+        x=0,
+        y=1.0,
+        bgcolor='rgba(255, 255, 255, 0.5)',
+        bordercolor='rgba(255, 255, 255, 0)'
+    ),
+        
 )
-# Add buttons
+# Add range slider
 vessels_number.update_layout(
     xaxis=dict(
         rangeselector=dict(
@@ -85,7 +110,7 @@ vessels_number.update_layout(
         type="date"
     )
 )
-
+#Add buttons
 vessels_number.update_layout(
     updatemenus=[
         dict(
@@ -105,8 +130,8 @@ vessels_number.update_layout(
             ]),
             pad={"r": 0, "t": 0},
             showactive=True,
-            x=1.2,
-            xanchor="right",
+            x=0.5,
+            xanchor="left",
             y=1,
             yanchor="bottom"
         ),
@@ -115,9 +140,9 @@ vessels_number.update_layout(
             direction="left",
             pad={"r": 0, "t": 0},
             showactive=True,
-            x=1.179,
+            x=0.48,
             xanchor="right",
-            y=1.10,
+            y=1,
             yanchor="bottom",
             buttons=list([
                 dict(label="None",
@@ -161,8 +186,13 @@ fig_exp.update_layout(
     yaxis=dict(
         title='Quantities',
     ),
-
     barmode='group',
+    legend=dict(
+        x=0,
+        y=1.0,
+        bgcolor='rgba(255, 255, 255, 0.5)',
+        bordercolor='rgba(255, 255, 255, 0)'
+    ),
 )
 # Add buttons
 fig_exp.update_layout(
@@ -211,8 +241,8 @@ fig_exp.update_layout(
             ]),
             pad={"r": 0, "t": 0},
             showactive=True,
-            x=1.2,
-            xanchor="right",
+            x=0.5,
+            xanchor="left",
             y=1,
             yanchor="bottom"
         ),
@@ -221,9 +251,9 @@ fig_exp.update_layout(
             direction="left",
             pad={"r": 0, "t": 0},
             showactive=True,
-            x=1.21,
+            x=0.48,
             xanchor="right",
-            y=1.10,
+            y=1,
             yanchor="bottom",
             buttons=list([
                 dict(label="Exports",
