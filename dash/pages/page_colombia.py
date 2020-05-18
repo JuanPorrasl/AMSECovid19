@@ -27,6 +27,7 @@ import plotly.express as px
 
 #Python Script
 from cleaning_datas_co import COL_Covid, COL_City_Covid, COL_Dep_Covid, states_co
+from cleaning_datas_co import Covid_BOG, Localidad_Map,local_bog
 from cleaning_datas import df, today, yesterday, config
 
 #Cases by department
@@ -61,13 +62,6 @@ sex_state.update_layout(title_text="Gender")
 
 SexState = pd.DataFrame(COL_Covid.groupby(['Sex','State_of_treatment'])['Cases'].sum()).reset_index()
 
-SS_fig =go.Figure(go.Sunburst(
-    labels=SexState['State_of_treatment'],
-    parents=SexState['Sex'],
-    values=SexState['Cases'],
-))
-SS_fig.update_layout(margin = dict(t=0, l=0, r=0, b=0))
-
 #Correcting values of departments ONLY for the map
 COL_MAP = COL_Dep_Covid
 COL_MAP['Department_DANE'] = COL_MAP['Department_DANE'].replace({'NARINO':'NARIÑO'})
@@ -81,6 +75,15 @@ COL_MAP['text'] = 'Department: ' + COL_MAP['Department_DANE'].astype(str) + '<br
     'Recovered: ' + COL_MAP['Recovered'].astype(str) + '<br>' + \
     'Hospitalization: ' + COL_MAP['Hospitalization'].astype(str) + '<br>' + \
     'Intensive Care: ' + COL_MAP['Intensive Care'].astype(str)
+
+### BOGOTÁ CITY ###
+    
+Covid_estado = pd.DataFrame(Covid_BOG.groupby(['District','State of treatment'])['Cases'].agg('sum')).reset_index()
+Covid_estado = Covid_estado.sort_values(by='Cases', ascending=False, inplace=False)
+
+bar_bog = px.bar(Covid_estado, x="District", y="Cases", color='State of treatment',
+            color_discrete_sequence=['steelblue','palegreen','orangered','gray','darkred'])
+bar_bog.update_layout(title_text="Bogotá confirmed cases by district")
 
 def create_layout(app):
     body = dbc.Container(
@@ -156,7 +159,36 @@ def create_layout(app):
                     ),
                 ],
                 justify="center",
-            ), 
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.H3("Bogotá Covid19 evolution")
+                        ],
+                        md=12,
+                        
+                    ),
+                ],
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            #html.H5("Confirmed cases by department"),
+                            
+                            dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='bog-map',figure=bog_map, config=config)
+                            ),
+                        ],
+                        md=12,
+                    ),
+                ],
+                no_gutters=True,
+                className="mb-2",
+            ),
             dbc.Row(
                 [
                     dbc.Col(
@@ -164,14 +196,14 @@ def create_layout(app):
                         dcc.Loading(
                                 id="loading-1",
                                 type="default",
-                                children=dcc.Graph(id='mix_cases',figure=SS_fig, config=config)
+                                children=dcc.Graph(id='bog_health_state',figure=bar_bog, config=config)
                             ),                       
                         ],
                         md=12,
                     ),
                 ],
                 justify="center",
-            ),  
+            ),
         ],
         className="mt-4",
     )
@@ -198,3 +230,16 @@ COL_City_Covid.style.background_gradient(cmap='Reds',subset=["Intensive Care"])\
                         .background_gradient(cmap='Greys',subset=["Death"])\
                         .background_gradient(cmap='Greens',subset=["Recovered"])\
                         .background_gradient(cmap='Purples',subset=["Hospitalization"])
+
+### Bogotá COVID19 map
+                        
+bog_map = go.Figure(go.Choroplethmapbox(geojson=local_bog,
+                                    locations=Localidad_Map['District'],
+                                    z=Localidad_Map['Active'],
+                                    text = Localidad_Map['text'],
+                                    colorscale='matter', zmin=0,
+                                    colorbar_title = "Confirmed Cases",
+                                    marker_opacity=0.5, marker_line_width=0.2))
+bog_map.update_layout(mapbox_style="carto-positron",
+                      mapbox_zoom=9.5, mapbox_center = {"lat": 4.6097102 , "lon": -74.081749})
+bog_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
