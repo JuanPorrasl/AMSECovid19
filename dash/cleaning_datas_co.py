@@ -58,6 +58,8 @@ COL_Covid['Sex'] = COL_Covid['Sex'].replace({'m' : 'M','f':'F'})
 COL_Covid['Origin_Type'] = COL_Covid['Origin_Type'].replace({'en estudio':'En estudio'})
 COL_Covid['Health_condition'] = COL_Covid['Health_condition'].replace({'leve' : 'Leve'})
 COL_Covid['Country_of_Origin'] = COL_Covid['Country_of_Origin'].replace({'COLOMBIANA' : 'Colombia'})
+COL_Covid['Detection_date'] = COL_Covid['Detection_date'].replace({'19/15/2020':'2020-05-19T00:00:00.000'})
+COL_Covid['Detection_date'] = COL_Covid['Web_Reported_date']
 
 #New variables
 COL_Covid['Notification_date'] = pd.to_datetime(COL_Covid['Notification_date']).dt.strftime('%Y/%m/%d')
@@ -249,12 +251,4 @@ Covid_Localidad['Recovery Rate'] = Covid_Localidad['Recovered']/Covid_Localidad[
 
 Localidad_Map = Covid_Localidad
 Localidad_Map
-
-Localidad_Map['text'] = 'District: ' + Localidad_Map['District'].astype(str) + '<br>' + \
-    'Active: ' + Localidad_Map['Active'].astype(str) + '<br>' + \
-    'Deaths: ' + Localidad_Map['Death'].astype(str) + '<br>' + \
-    'Recovered: ' + Localidad_Map['Recovered'].astype(str) + '<br>' + \
-    'Hospitalization: ' + Localidad_Map['Hospital'].astype(str) + '<br>' + \
-    'Intensive Care: ' + Localidad_Map['Intensive Care'].astype(str)
-
 

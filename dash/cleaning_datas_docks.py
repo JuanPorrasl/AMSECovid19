@@ -187,6 +187,22 @@ if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os
     df.cal_eta=df.cal_eta.replace("<null>","")
     df.cal_last_place_code=df.cal_last_place_code.replace("<null>",float("NaN"))
     df.cal_next_place_code=df.cal_next_place_code.replace("<null>",float("NaN"))
+    
+    #Convert strange time format to REAL time sormat: 
+    ##find them if type = STR and length <= 12, 
+    ##convert comma to dot, 
+    ##convert to float, 
+    ##convert to REAL datetime
+    
+    for val in ["cal_eta","cal_etd"]:
+        ls_date=[]
+        condition=(df[val].apply(type)==str) & (df[val].str.len() <=12) & (df[val].str.len() > 0)
+        for elem in df.loc[condition,val].str.replace(",","."):
+            ls_date.append(pd.Timestamp("1900-01-01 00:00:00")+pd.Timedelta(elem+" days"))
+        
+        #re-add in the datas
+        df.loc[condition,val]=ls_date
+    
     df.cal_eta=pd.to_datetime(df.cal_eta)
     df.cal_etd=pd.to_datetime(df.cal_etd)
     df["cal_diff"]=(df.cal_etd-df.cal_eta)/np.timedelta64(1,'D')
