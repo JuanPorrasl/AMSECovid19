@@ -187,7 +187,6 @@ if datetime.fromtimestamp(max([os.path.getmtime(path+folder+elem) for elem in os
     df.cal_eta=df.cal_eta.replace("<null>","")
     df.cal_last_place_code=df.cal_last_place_code.replace("<null>",float("NaN"))
     df.cal_next_place_code=df.cal_next_place_code.replace("<null>",float("NaN"))
-    #TODO: Mettre lecture du format de la date
     
     #Convert strange time format to REAL time sormat: 
     ##find them if type = STR and length <= 12, 

@@ -130,6 +130,11 @@ df.Last_Update=pd.to_datetime(df.Last_Update, format='%m-%d-%Y')
 continent=pd.read_excel(folder+'/processed/country2continent.xlsx', index_col=0)
 df=df.merge(continent, left_on='Country_Region', how='left', right_on='Country_Region')
 
+#Remove country if number of observations < 20 (create bugs)
+temp=df.groupby("Country_Region", as_index=False)["Lat"].agg(["count"])["count"].reset_index()
+keep_country=temp.loc[(temp["count"] > 20),"Country_Region"]
+df=df[df.Country_Region.isin(keep_country)]
+del(temp, keep_country)
 
 
 #Add groupby date for sum Worldwide datas
