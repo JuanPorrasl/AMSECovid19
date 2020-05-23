@@ -13,6 +13,9 @@ import plotly.express as px
 
 from cleaning_datas import df, last_file_hopkins, config, df_pop
 
+from cleaning_datas import df, last_file_hopkins, config, df_pop
+from cleaning_datas_tests import OWData
+
 ## Ratios plots
 df_data=pd.DataFrame(df.groupby(["Country_Region","Last_Update"]).sum())
 df_data["ratio"]=100*df.groupby(["Country_Region","Last_Update"]).Deaths.sum()/df.groupby(["Country_Region","Last_Update"]).Confirmed.sum()
@@ -23,13 +26,18 @@ df_data[np.isnan(df_data['ratio_2'])]=0
 
 countries={"China":"#FF9671","France":"#845EC2","Italy":"#D65DB1","US":"#FF6F91","Russia":"#2C73D2","Germany":"#00C9A7","United Kingdom":"#B0A8B9"}
 
-
 #Generating tables
 df_tables=df_data.reset_index()
 classement=df_tables[(df_tables.Last_Update==df_tables.Last_Update.max()) & (df_tables.Confirmed>=100)]
 classement=classement.rename(columns={"Country_Region":"Countries","ratio":"Lethality rates", "ratio_2":"rates"})
 classement["Lethality rates"]=classement["Lethality rates"].round(2)
 classement["rates"]=classement["rates"].round(2)
+
+
+#Dropdown for countries tests
+dropdown_options = [
+        {'label':i, 'value': i} for i in OWData['location'].unique()
+        ]
 
 def create_layout(app):
     body = dbc.Container(
@@ -91,6 +99,76 @@ def create_layout(app):
                                 children=dcc.Graph(id='tabs-content', config=config)
                             ),
                             
+                        ],
+                        md=12,
+                    ),
+                ],
+                no_gutters=True,
+            ),
+            #Dropdown
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.H2("Tests Performed Worldwide"),
+                        ],
+                        md=12,
+                        
+                    ),
+                ],
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [              
+                            dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='test_line',figure=test_line, config=config)
+                            ),
+                        ],
+                        md=12,
+                    ),
+                ],
+                no_gutters=True,
+                className="mb-2",
+            ),  
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.H4("Tests / Confirmed / Deaths"),
+                        ],
+                        md=12,
+                        
+                    ),
+                ],
+            ),
+            dbc.Row(
+                [
+                    dbc.Col([
+                        dcc.Dropdown(
+                            id="selected_country",
+                            options=dropdown_options,
+                            value='United States',
+                            className="mb-2 mt-4",
+                            clearable=False,
+                        ),
+                    ],
+                    xl=4,
+                    ),
+                ],
+                justify="center",
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dcc.Loading(
+                                id="loading-1",
+                                type="default",
+                                children=dcc.Graph(id='Covid19-tests', config=config)
+                            ),
                         ],
                         md=12,
                     ),
@@ -164,7 +242,47 @@ def switch_tab(at):
                             opacity=0.8))
         fig.update_layout(height=400, title_text="Deaths/Confirmed ratio")
         return fig
-   
+  
+#Covid19 tests
+    
+test_line = px.line(OWData, y='total_tests', x="date", color="location")
+test_line.update_layout(title='Covid19 tests',
+                   xaxis_title='',
+                   yaxis_title='')
+
+@app.callback(Output('Covid19-tests', 'figure'),
+              [Input('selected_country', 'value')])
+def update_cumulative_cases(selected_country):
+    
+    cond = (OWData['location']==selected_country)
+    OWD = OWData[cond]
+    
+    fig = go.Figure()
+    
+    #Confirmed
+    fig.add_trace(go.Scatter(
+        x=OWD["date"],
+        y=OWD['total_tests'],
+        name='Total tests',
+        #connectgaps=True,
+    ))
+    fig.add_trace(go.Scatter(
+        x=OWD["date"],
+        y=OWD["total_cases"],
+        name='Confirmed Cases',
+        #connectgaps=True,
+    ))
+    fig.add_trace(go.Scatter(
+        x=OWD["date"],
+        y=OWD["total_deaths"],
+        name='Deaths',
+        #connectgaps=True,
+    ))
+
+    fig.update_layout(xaxis_rangeslider_visible=True)
+
+    return fig   
+    
 # Cases, deaths and total population
 pop_fig = px.treemap(df_pop, path=['Country_Region','Confirmed','Deaths'], values='PopTotal',
                      color='Deaths',
