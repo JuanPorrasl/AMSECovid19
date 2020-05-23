@@ -26,8 +26,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 #Python Script
-from cleaning_datas_co import COL_Covid, COL_City_Covid, COL_Dep_Covid, states_co
-from cleaning_datas_co import Covid_BOG, Localidad_Map,local_bog
+from cleaning_datas_co import COL_Covid, COL_City_Covid, COL_Dep_Covid, states_co, Covid_BOG, Localidad_Map,local_bog
 from cleaning_datas import df, today, yesterday, config
 
 #Cases by department
@@ -78,10 +77,10 @@ COL_MAP['text'] = 'Department: ' + COL_MAP['Department_DANE'].astype(str) + '<br
 
 ### BOGOTÁ CITY ###
     
-Covid_estado = pd.DataFrame(Covid_BOG.groupby(['District','State of treatment'])['Cases'].agg('sum')).reset_index()
+Covid_estado = pd.DataFrame(Covid_BOG.groupby(['District','State_of_treatment'])['Cases'].agg('sum')).reset_index()
 Covid_estado = Covid_estado.sort_values(by='Cases', ascending=False, inplace=False)
 
-bar_bog = px.bar(Covid_estado, x="District", y="Cases", color='State of treatment',
+bar_bog = px.bar(Covid_estado, x="District", y="Cases", color='State_of_treatment',
             color_discrete_sequence=['steelblue','palegreen','orangered','gray','darkred'])
 bar_bog.update_layout(title_text="Bogotá confirmed cases by district")
 
@@ -101,8 +100,8 @@ Localidad_Map['text_recover'] = 'District: ' + Localidad_Map['District'].astype(
 #Pie charts
 #State_of_treatment
 
-State_bog = pd.DataFrame(Covid_BOG.groupby(['State of treatment'])['Cases'].sum()).reset_index()
-pie_bog_state = px.pie(State, values=State_bog['Cases'], names=State_bog['State of treatment'], hole=.7,
+State_bog = pd.DataFrame(Covid_BOG.groupby(['State_of_treatment'])['Cases'].sum()).reset_index()
+pie_bog_state = px.pie(State, values=State_bog['Cases'], names=State_bog['State_of_treatment'], hole=.7,
             color_discrete_sequence=['steelblue','palegreen','orangered','gray','darkred'])
 pie_bog_state.update_layout(title_text="Health Condition")
 #Sex
