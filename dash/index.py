@@ -47,7 +47,7 @@ os.chdir(config['directory']['application'])
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Worldwide", href="/")),
-        dbc.NavItem(dbc.NavLink("Global analysis", href="/global")),
+        dbc.NavItem(dbc.NavLink("Global analysis", href="/global")),   
         dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem("Detailed studies", header=True),
