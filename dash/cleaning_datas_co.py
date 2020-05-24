@@ -64,7 +64,7 @@ new_columns = {'ID de caso':'Case_ID',
 COL_Covid = COL_Covid.rename(columns=new_columns)
 
 #Correcting uppercases
-for elem in ["Origin_Type", "Health_condition", "Country_of_Origin", "Sex"]:
+for elem in ["Origin_Type", "Health_condition", "Country_of_Origin", "Sex", "State_of_treatment"]:
     COL_Covid[elem]=COL_Covid[elem].str.capitalize()
 
 #Correcting values when "- -" then NA
@@ -78,7 +78,7 @@ COL_Covid['Cumulative_Confirmed'] = COL_Covid.groupby(['Detection_date','City'])
 
 #Translation to english
 State_treat_dicc = {'Recuperado':'Recovered', 'Casa':'Home', 'Fallecido':'Death',
-                    'Hospital UCI':'Intensive Care', 'Hospital':'Hospitalization'}
+                    'Hospital uci':'Intensive Care', 'Hospital':'Hospitalization'}
 Origin_dicc = {'Importado':'Imported', 'Relacionado':'Related', 'En estudio':'In study'}
 Health_dicc = {'Leve':'Mild', 'Asintomático':'No Symptoms', 'Fallecido':'Death',
                'Grave':'Serious', 'Moderado':'Stable'}
@@ -171,11 +171,14 @@ Location_correct = {'Casa':'Home',
                     'Hospital UCI':'Intensive Care',
                     'Fallecido':'Death',
                     'Hospital':'Hospital',
-                    'Recuperado':'Recovered'}
+                    'Estudio':'In Study',
+                    'Recuperado':'Recovered'
+                    }
 Health_cond_correct = {'Recuperado':'Recovered',
                        'Moderado':'Home',
                        'Crítico':'Hospital',
                        'Fallecido':'Death',
+                       'Estudio':'In Study',
                        'Severo':'Intensive Care'} 
 
 Covid_BOG['Tipo de caso'] = Covid_BOG['Tipo de caso'].replace(Type_correct)
