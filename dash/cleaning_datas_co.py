@@ -45,7 +45,7 @@ except Exception as e:
     
 new_columns = {'ID de caso':'Case_ID',
                   'Fecha de notificación':'Notification_date',
-                  'Codigo DIVIPOLA':'DIVIPOLA_Code',
+                  'Código DIVIPOLA':'DIVIPOLA_Code',
                   'Ciudad de ubicación':'City',
                   'Departamento o Distrito ':'Department',
                   'atención':'State_of_treatment',
