@@ -14,16 +14,34 @@ def timer():
 
 print(timer()+'[INFO] Importing Brazil datas')
 
-# Downloading the data from Brasil.io
-try:
-    response = requests.get("https://data.brasil.io/dataset/covid19/caso_full.csv.gz")
-    brazil_data = pd.read_csv(io.BytesIO(response.content), sep=',', compression='gzip')
-    brazil_data.to_csv("data/external/brazil/br-covid-19.csv.gzip", sep=';', compression='gzip')
-except Exception:
-    #If fail, we load our file
-    print('\033[1;31;48m'+timer()+'[WARNING] Brazil covid-19 link is not accessible. Reading previous file..')
-    brazil_data = pd.read_csv("data/external/brazil/br-covid-19.csv.gzip", sep=';',  compression='gzip', index_col=0)
- 
+brazil_link_folder="data/external/brazil/br-covid-19.csv.gzip"
+
+
+#Download Brazil Datas
+flag_br=0
+if os.path.exists(brazil_link_folder):
+    file_create=os.path.getmtime(brazil_link_folder)
+    file_create=pd.to_datetime(datetime.fromtimestamp(file_create).strftime('%Y-%m-%d'), format='%Y-%m-%d', utc=True)
+    if (pd.Timestamp.today(tz="UTC")-file_create >= pd.Timedelta('1 days')):
+        flag_br=1
+else:
+    flag_br=1
+    
+
+if flag_br:
+    # Downloading the data from Brasil.io
+    try:
+        response = requests.get("https://data.brasil.io/dataset/covid19/caso_full.csv.gz")
+        brazil_data = pd.read_csv(io.BytesIO(response.content), sep=',', compression='gzip')
+        brazil_data.to_csv(brazil_link_folder, sep=';', compression='gzip')
+    except Exception:
+        #If fail, we load our file
+        print('\033[1;31;48m'+timer()+'[WARNING] Brazil covid-19 link is not accessible. Reading previous file..')
+        brazil_data = pd.read_csv(brazil_link_folder, sep=';',  compression='gzip', index_col=0)
+else:
+    brazil_data = pd.read_csv(brazil_link_folder, sep=';',  compression='gzip', index_col=0)
+    
+del flag_br
 
 
 # Converting date to datetime
