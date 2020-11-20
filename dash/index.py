@@ -25,7 +25,7 @@ import time
 
 from app import app, auth
 
-from pages import page_france, page_brazil, page_docks, page_worldwide, page_analysis, page_legalnotice, page_pollution
+from pages import page_US
 
 # Exposing server for gunicorn
 server = app.server
@@ -47,13 +47,13 @@ os.chdir(config['directory']['application'])
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Worldwide", href="/")),
-        dbc.NavItem(dbc.NavLink("Global analysis", href="/global")),   
+        #dbc.NavItem(dbc.NavLink("Global analysis", href="/global")),   
         dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem("Detailed studies", header=True),
                 #dbc.DropdownMenuItem("United States", href="/US"),
-                dbc.DropdownMenuItem("Brazil", href="/brazil"),
-                dbc.DropdownMenuItem("France", href="/france"),
+                #dbc.DropdownMenuItem("Brazil", href="/brazil"),
+                #dbc.DropdownMenuItem("France", href="/france"),
             ],
             nav=True,
             in_navbar=True,
@@ -62,8 +62,8 @@ navbar = dbc.NavbarSimple(
         dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem("Economic Indicators", header=True),
-                dbc.DropdownMenuItem("Air pollution", href="/air_pollution"),
-                dbc.DropdownMenuItem("port of Marseille/Fos", href="/docks"), 
+                #dbc.DropdownMenuItem("Air pollution", href="/air_pollution"),
+                #dbc.DropdownMenuItem("port of Marseille/Fos", href="/docks"), 
             ],
             nav=True,
             in_navbar=True,
@@ -120,8 +120,10 @@ app.layout = (
 # Update page
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
-    #if pathname == "/US":
-    #    return page_US.create_layout(app)
+    return page_US.create_layout(app)
+    """
+    if pathname == "/US":
+        return page_US.create_layout(app)
     if pathname == "/france":
         return page_france.create_layout(app)
     if pathname == "/brazil":
@@ -136,6 +138,7 @@ def display_page(pathname):
         return page_pollution.create_layout(app)
     else:
         return page_worldwide.body_worldwide
+    """
   
 #Favicon
 @server.route('/favicon.ico')
