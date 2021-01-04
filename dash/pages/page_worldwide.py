@@ -308,7 +308,7 @@ def update_daily_cases(selected_country):
     def bar_graph(values, col):
         yaxis_max = values[col].max()*1.1
         fig = go.Figure(
-            data=[go.Bar(x=labels, y=values[col].tolist())],
+            data=[go.Scatter(x=labels, y=values[col].tolist())],
             layout_title_text=dct[col]['title']
         )
         fig.update_traces(marker_color=dct[col]['color'])
@@ -316,6 +316,8 @@ def update_daily_cases(selected_country):
         return fig
     graphs = {col: bar_graph(values, col) for col in dct.keys()}    
     return graphs['Confirmed'], graphs['Recovered'], graphs['Deaths']
+
+
 
 @app.callback(Output('infection-cases', 'figure'),
               [Input('selected_country', 'value')])

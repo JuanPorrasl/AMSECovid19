@@ -2,7 +2,7 @@ local:
   directory:
     application: './' 
 
-  debug: True
+  debug: False
 
 
 staging:
