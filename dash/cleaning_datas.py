@@ -73,8 +73,10 @@ for i in range(1,delta+1):
             time.sleep(1)
 
 #Load all files
-list_files=os.listdir(folder+"/external/hopkins")
-list_files.sort()
+list_files=pd.Series(os.listdir(folder+"/external/hopkins"))
+
+#Fix sorting
+list_files=pd.to_datetime(list_files.str.slice(0,-4)).sort_values().dt.strftime('%m-%d-%Y.csv')
 
 days=pd.DataFrame()
 
