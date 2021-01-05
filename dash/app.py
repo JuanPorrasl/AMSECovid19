@@ -11,15 +11,3 @@ app.title = 'Covid19 - AMSE Student Dashboard'
 server = app.server
 app.config.suppress_callback_exceptions = True
 
-
-if os.environ.get('COVID_APP_ENV', 'local') != 'local':
-   from confidential.secrets import VALID_USERNAME_PASSWORD_PAIRS
-else:
-   from local_env import VALID_USERNAME_PASSWORD_PAIRS
-
-
-auth = dash_auth.BasicAuth(
-    app,
-    VALID_USERNAME_PASSWORD_PAIRS
-)
-
